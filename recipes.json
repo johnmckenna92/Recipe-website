@@ -1,0 +1,1129 @@
+[
+    {
+        "id": 1,
+        "title": "Chicken Tikka",
+        "cat": "Chicken",
+        "pro": 38,
+        "cal": 420,
+        "time": 240,
+        "serves": 1,
+        "ing": [
+            "100g chicken",
+            "0.5 pack Tilda rice",
+            "250g passata",
+            "1 tsp mango chutney",
+            "1 tsp garlic and ginger paste",
+            "2 tbsp chicken tikka paste",
+            "1 poppadom"
+        ],
+        "inst": "Method 1 - Add ingredients to slow cooker, cook high 3-4 hours. Method 2 – Dice chicken, add to pan with ingredients. Simmer until cooked. Serve with rice and poppadom."
+    },
+    {
+        "id": 2,
+        "title": "Loaded Fries",
+        "cat": "Pork & Bacon",
+        "pro": 28,
+        "cal": 380,
+        "time": 25,
+        "serves": 1,
+        "ing": [
+            "2 bacon medallions",
+            "60g eat lean protein cheese",
+            "2 tbsp light mayonnaise",
+            "150g potato"
+        ],
+        "inst": "Slice potato to wedges, fry light, cook 180C air fryer 20 mins. Cook bacon 15 mins, dice. Cover wedges with mayo and cheese, microwave 5 mins till melted. Top with bacon."
+    },
+    {
+        "id": 3,
+        "title": "Teriyaki Salmon",
+        "cat": "Fish & Seafood",
+        "pro": 30,
+        "cal": 410,
+        "time": 15,
+        "serves": 1,
+        "ing": [
+            "112.5g salmon fillet",
+            "52.5g basmati rice",
+            "50g broccoli",
+            "1 tbsp teriyaki sauce"
+        ],
+        "inst": "Boil rice and broccoli. Cook salmon, drizzle with teriyaki sauce. Serve with rice and broccoli."
+    },
+    {
+        "id": 4,
+        "title": "Fish and Chips",
+        "cat": "Fish & Seafood",
+        "pro": 28,
+        "cal": 350,
+        "time": 30,
+        "serves": 1,
+        "ing": [
+            "100g cod fillet",
+            "1 egg",
+            "12.5g breadcrumbs",
+            "50g mushy peas",
+            "110g white potato"
+        ],
+        "inst": "Slice potato into wedges, cook until golden. Whisk egg, roll cod in egg then breadcrumbs. Cook oven/air fryer 30 mins. Serve with wedges and mushy peas."
+    },
+    {
+        "id": 5,
+        "title": "Turkey Burger",
+        "cat": "Burgers & Wraps",
+        "pro": 35,
+        "cal": 360,
+        "time": 15,
+        "serves": 1,
+        "ing": [
+            "1 brioche bun",
+            "114g turkey mince",
+            "10g mature cheddar",
+            "1 handful salad"
+        ],
+        "inst": "Roll turkey mince into burger shape. Cook in pan, cover with cheese to melt. Place in bun with salad."
+    },
+    {
+        "id": 6,
+        "title": "KFC",
+        "cat": "Chicken",
+        "pro": 38,
+        "cal": 400,
+        "time": 30,
+        "serves": 1,
+        "ing": [
+            "112.5g chicken breast",
+            "25g southern fried breadcrumbs",
+            "1 egg",
+            "100g white potato",
+            "10g chicken gravy granules"
+        ],
+        "inst": "Slice potato into wedges, cook until golden. Whisk egg, roll chicken in egg then breadcrumbs, cook 30 mins. Serve with wedges and gravy."
+    },
+    {
+        "id": 7,
+        "title": "Spaghetti Bolognaise",
+        "cat": "Beef",
+        "pro": 32,
+        "cal": 430,
+        "time": 25,
+        "serves": 1,
+        "ing": [
+            "115g 5% beef mince",
+            "50g mushrooms",
+            "1 onion",
+            "1 tin tinned tomatoes",
+            "63.8g spaghetti",
+            "1 tbsp garlic powder"
+        ],
+        "inst": "Dice onion and mushrooms, sprinkle garlic, cook soft. Add mince then tomatoes, simmer. Boil spaghetti, top with bolognaise."
+    },
+    {
+        "id": 8,
+        "title": "Carbonara",
+        "cat": "Chicken",
+        "pro": 36,
+        "cal": 450,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "100g chicken",
+            "1 tbsp bacon bits",
+            "50g mushrooms",
+            "1 tbsp garlic powder",
+            "8g butter",
+            "38g spaghetti pasta",
+            "25g Philadelphia light"
+        ],
+        "inst": "Boil pasta. Pan fry butter, garlic, chicken. Add diced mushrooms, bacon bits. Drain pasta, combine all ingredients and mix in Philadelphia."
+    },
+    {
+        "id": 9,
+        "title": "Nacho Chicken Burger",
+        "cat": "Burgers & Wraps",
+        "pro": 34,
+        "cal": 410,
+        "time": 30,
+        "serves": 1,
+        "ing": [
+            "100g chicken",
+            "1 egg white",
+            "8g Doritos",
+            "1 lighter cheese slice",
+            "1 brioche burger bun",
+            "75g white potato",
+            "15g ice berg lettuce",
+            "1 tomato"
+        ],
+        "inst": "Thinly slice potato, air fry 30 mins. Crush Doritos. Roll chicken in egg white then Doritos. Air fry 30 mins. Top with cheese, serve in bun with salad."
+    },
+    {
+        "id": 10,
+        "title": "Chicken Bhuna",
+        "cat": "Chicken",
+        "pro": 42,
+        "cal": 390,
+        "time": 35,
+        "serves": 1,
+        "ing": [
+            "125g chicken",
+            "1 onion",
+            "1 green chilli",
+            "1 tbsp garlic",
+            "2 tsp garam masala",
+            "1 tsp ground coriander",
+            "2 tsp cumin",
+            "1 tsp turmeric",
+            "2 tsp olive oil",
+            "1 tin 400g tinned tomatoes",
+            "25g basmati rice"
+        ],
+        "inst": "Fry onion, chilli, garlic in oil. Add spices, then diced chicken. Add tomatoes and half tin water. Bubble 20 mins. Serve on rice."
+    },
+    {
+        "id": 11,
+        "title": "Chicken & Mushroom Pizza with Chips",
+        "cat": "Chicken",
+        "pro": 38,
+        "cal": 460,
+        "time": 30,
+        "serves": 1,
+        "ing": [
+            "1 Lo Dough pizza base",
+            "4 tbsp tomato puree",
+            "75g chicken",
+            "25g grated cheddar cheese",
+            "75g mushrooms",
+            "100g potato"
+        ],
+        "inst": "Slice potato to wedges, cook 30 mins. Cook chicken and mushrooms. Cover base with puree, cheese, chicken, mushrooms. Cook as per packet. Serve with chips."
+    },
+    {
+        "id": 12,
+        "title": "Greek Flatbread",
+        "cat": "Burgers & Wraps",
+        "pro": 35,
+        "cal": 420,
+        "time": 15,
+        "serves": 1,
+        "ing": [
+            "100g chicken",
+            "1 plain naan bread",
+            "1 red onion",
+            "1 tomato",
+            "50g zero fat Greek yoghurt",
+            "1 tsp garlic powder",
+            "0.25 cucumber"
+        ],
+        "inst": "Dice and grill chicken. Dice onion and tomato. Top naan with chicken, onion, tomato. Cook 10 mins. Mix grated cucumber, garlic, yoghurt. Top cooked naan with tzatziki."
+    },
+    {
+        "id": 13,
+        "title": "Risotto",
+        "cat": "Chicken",
+        "pro": 33,
+        "cal": 380,
+        "time": 30,
+        "serves": 1,
+        "ing": [
+            "100g chicken",
+            "100g chestnut mushrooms",
+            "5g light butter",
+            "1 onion",
+            "1 tbsp garlic puree",
+            "50g risotto rice",
+            "12g parmesan cheese",
+            "1 handful parsley",
+            "1 tsp olive oil",
+            "1 chicken stock cube",
+            "500ml boiling water"
+        ],
+        "inst": "Rehydrate mushrooms in 500ml boiling water. Cook sliced chicken, set aside. Fry butter, oil, onion, garlic. Add sliced mushrooms and rice. Gradually stir in stock for 15 mins. Add parmesan, chicken, parsley."
+    },
+    {
+        "id": 14,
+        "title": "Chicken Parmesan",
+        "cat": "Chicken",
+        "pro": 45,
+        "cal": 480,
+        "time": 40,
+        "serves": 1,
+        "ing": [
+            "25g Paxo breadcrumbs",
+            "1 egg white",
+            "100g chicken breast",
+            "15g mature cheese",
+            "1 tbsp white flour",
+            "100ml soy milk",
+            "10g Parmesan cheese",
+            "100g potato"
+        ],
+        "inst": "Roll chicken in egg white then breadcrumbs. Slice potato to wedges. Air fry both 30 mins. Boil milk, stir in flour, thicken, add parmesan. Cover chicken with sauce and mature cheese. Cook further 10 mins."
+    },
+    {
+        "id": 15,
+        "title": "Tandoori Fish Burger",
+        "cat": "Fish & Seafood",
+        "pro": 38,
+        "cal": 390,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "50g tiger prawns",
+            "50g white cod",
+            "50g salmon",
+            "14g paxo breadcrumbs",
+            "0.25 tsp cumin",
+            "0.5 tsp turmeric",
+            "1 tsp garam masala",
+            "0.5 tsp paprika",
+            "0.5 tsp ground coriander",
+            "1 brioche bun",
+            "1 handful diced lettuce",
+            "15g zero fat Greek yoghurt",
+            "1 tsp mint sauce",
+            "0.25 cucumber"
+        ],
+        "inst": "Mix fish, prawns, spices, breadcrumbs. Shape into burger. Chill 1hr. Grill 10-15 mins. Raita: mix yoghurt, mint, grated cucumber. Arrange lettuce on bun, top with burger and raita."
+    },
+    {
+        "id": 16,
+        "title": "Crispy Parma Ham Gnocchi",
+        "cat": "Pork & Bacon",
+        "pro": 18,
+        "cal": 340,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "100g gnocchi",
+            "6 slices prosciutto ham",
+            "6g ricotta cheese",
+            "10g cherry tomatoes",
+            "1 tsp olive oil",
+            "1 handful fresh basil leaves",
+            "1 tsp garlic"
+        ],
+        "inst": "Boil gnocchi. Heat oil, fry ham crispy. Add tomatoes, garlic, basil, stir. Pour mixture over gnocchi, cover with chopped ricotta."
+    },
+    {
+        "id": 17,
+        "title": "Bacon Mac n Cheese",
+        "cat": "Pork & Bacon",
+        "pro": 35,
+        "cal": 460,
+        "time": 25,
+        "serves": 1,
+        "ing": [
+            "3 bacon medallions",
+            "2 spring onions",
+            "2 tbsp flour",
+            "200ml soy milk",
+            "40g eat lean protein cheese",
+            "21g parmesan cheese",
+            "38g macaroni pasta",
+            "14g breadcrumbs",
+            "1 tbsp olive oil"
+        ],
+        "inst": "Chop bacon, cook crispy. Add spring onions, put aside. Boil macaroni. Heat oil and flour, whisk in milk until creamy. Add cheeses, mix till melted. Stir in macaroni and bacon. Top with breadcrumbs."
+    },
+    {
+        "id": 18,
+        "title": "Thai Beef",
+        "cat": "Beef",
+        "pro": 36,
+        "cal": 400,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "125g diced beef",
+            "50g basmati rice",
+            "60g low fat cottage cheese",
+            "1 tbsp curry powder",
+            "1 pepper",
+            "1 onion"
+        ],
+        "inst": "Boil rice. Dice onion and pepper, cook soft. Add steak, cook through. Stir in cottage cheese and curry powder. Serve on rice."
+    },
+    {
+        "id": 19,
+        "title": "Pepperoni Pizza Pasta",
+        "cat": "Beef",
+        "pro": 35,
+        "cal": 430,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "62g eat lean protein cheese",
+            "60g spaghetti pasta",
+            "1 tbsp olive oil",
+            "6 slices pepperoni",
+            "10g mozzarella",
+            "1 tbsp oregano",
+            "1 can tinned tomatoes",
+            "1 garlic clove"
+        ],
+        "inst": "Boil spaghetti. Heat oil, crisp pepperoni. Add chopped garlic, cook 5 mins, add tomatoes and oregano. Add pasta, tear mozzarella, half lean cheese. Top with remaining lean cheese."
+    },
+    {
+        "id": 20,
+        "title": "Lasagne",
+        "cat": "Beef",
+        "pro": 32,
+        "cal": 450,
+        "time": 50,
+        "serves": 2,
+        "ing": [
+            "125g 5% beef mince",
+            "0.5 can tinned tomatoes",
+            "12.5g mild low fat cheese",
+            "10g parmesan cheese",
+            "3 lasagne sheets",
+            "0.5 tbsp flour",
+            "100ml soy milk",
+            "150g potato"
+        ],
+        "inst": "(Ingredients mapped to 1 portion). Slice potatoes to wedges, bake 175C 30m. Cook mince brown, add tomatoes. Sauce: boil milk, stir flour, remove from heat, stir parmesan. Layer sheets, bolognaise, sauce, top with mild cheese. Cook 175C 40 mins."
+    },
+    {
+        "id": 21,
+        "title": "Red Thai Curry",
+        "cat": "Chicken",
+        "pro": 32,
+        "cal": 390,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "100g chicken",
+            "1 tbsp sunflower oil",
+            "3 tbsp red curry paste",
+            "150ml low fat tinned coconut milk",
+            "1 tbsp ginger & garlic paste",
+            "1 tbsp fish sauce",
+            "1 red chilli",
+            "36g basmati rice"
+        ],
+        "inst": "Fry ginger/garlic paste in oil. Add curry paste, gradually pour coconut milk. Simmer, add diced chicken. Cook thoroughly, add fish sauce. Serve on rice with diced chilli."
+    },
+    {
+        "id": 22,
+        "title": "Burrito",
+        "cat": "Burgers & Wraps",
+        "pro": 34,
+        "cal": 410,
+        "time": 15,
+        "serves": 1,
+        "ing": [
+            "113g 5% beef mince",
+            "8g light cheddar",
+            "1 tortilla wrap",
+            "1 handful chopped iceberg lettuce",
+            "1 tbsp light mayo",
+            "1 tbsp tomato sauce",
+            "1 onion",
+            "1 tsp chilli powder"
+        ],
+        "inst": "Season mince with chilli, cook with onion. Place in center of wrap. Mix mayo and ketchup, pour over mince. Top with cheese and lettuce. Fold edges. Spray pan, cook burrito 5 mins each side."
+    },
+    {
+        "id": 23,
+        "title": "Chicken Shawarma",
+        "cat": "Chicken",
+        "pro": 38,
+        "cal": 370,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "125g diced chicken",
+            "2 peppers",
+            "2 sandwich thins",
+            "15g shawarma seasoning",
+            "35g fat free Greek yoghurt",
+            "1 tbsp garlic puree"
+        ],
+        "inst": "Marinate chicken in seasoning. Dice peppers, cook with chicken. Toast sandwich thins. Mix yoghurt and puree. Serve chicken in thins, drizzle garlic sauce."
+    },
+    {
+        "id": 24,
+        "title": "Chinese Chicken Curry",
+        "cat": "Chicken",
+        "pro": 42,
+        "cal": 400,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "150g chicken",
+            "0.5 pack Tilda rice",
+            "15g mayflower curry powder",
+            "20g peas",
+            "1 onion"
+        ],
+        "inst": "Dice onion and chicken, cook in pan. Mix curry powder with 100ml boiling water. Add sauce and peas to pan. Serve on rice."
+    },
+    {
+        "id": 25,
+        "title": "McChicken Sandwich",
+        "cat": "Burgers & Wraps",
+        "pro": 35,
+        "cal": 380,
+        "time": 30,
+        "serves": 1,
+        "ing": [
+            "125g chicken",
+            "18g cornflakes",
+            "1 egg white",
+            "1 tbsp light mayo",
+            "20g iceberg lettuce",
+            "1 seeded burger bun",
+            "1 tsp garlic granules",
+            "1 tsp paprika"
+        ],
+        "inst": "Mix seasoning with crushed cornflakes. Roll chicken in egg white then cornflake mix. Cook 25-30 mins at 180C. Serve in bun with lettuce and mayo."
+    },
+    {
+        "id": 26,
+        "title": "Garlic Pizza Bread & Chips",
+        "cat": "Vegetarian & Other",
+        "pro": 28,
+        "cal": 430,
+        "time": 30,
+        "serves": 1,
+        "ing": [
+            "2 mini tortilla wraps",
+            "37g eat lean protein cheese",
+            "18g cheddar light",
+            "12g mozzarella",
+            "1 tbsp oregano",
+            "1 tbsp garlic granules",
+            "8g light butter",
+            "100g potato"
+        ],
+        "inst": "Dice potato for chips, cook 25-30 mins. Spread butter on each tortilla. Spread cheese mix on tortillas. Sprinkle oregano and garlic. Stack tortillas, cook 180C for 10-15 mins."
+    },
+    {
+        "id": 27,
+        "title": "Prawn Linguine",
+        "cat": "Fish & Seafood",
+        "pro": 28,
+        "cal": 390,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "100g tiger prawns",
+            "1 tsp lemon juice",
+            "1 tbsp garlic puree",
+            "70ml low fat crème fraiche",
+            "50g linguine pasta",
+            "18g parmesan cheese"
+        ],
+        "inst": "Boil pasta. Heat garlic 1-2 mins, stir in crème fraiche and lemon. Simmer, add prawns. Remove from heat, stir in parmesan. Combine with drained pasta."
+    },
+    {
+        "id": 28,
+        "title": "Mince & Dumplings",
+        "cat": "Beef",
+        "pro": 33,
+        "cal": 440,
+        "time": 35,
+        "serves": 2,
+        "ing": [
+            "0.5 packet dumpling mix",
+            "125g 5% beef mince",
+            "1 handful frozen peas",
+            "1 handful frozen carrots",
+            "1.5 tbsp gravy granules"
+        ],
+        "inst": "(Ingredients mapped to 1 portion). Cook mince. Mix gravy granules with boiling water, stir into mince. Add peas/carrots. Pour into dish. Mix dumpling dough with water, roll balls, add to dish. Cook 25-30 mins at 180C."
+    },
+    {
+        "id": 29,
+        "title": "Jerk Chicken",
+        "cat": "Chicken",
+        "pro": 39,
+        "cal": 380,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "100g Dunns River Seasoning",
+            "1 pepper",
+            "0.5 pack Tilda Caribbean Rice & Peas basmati rice",
+            "137g chicken"
+        ],
+        "inst": "Marinate diced chicken overnight. Dice pepper, cook with chicken. Serve on cooked rice."
+    },
+    {
+        "id": 30,
+        "title": "Toad In The Hole",
+        "cat": "Pork & Bacon",
+        "pro": 30,
+        "cal": 460,
+        "time": 35,
+        "serves": 2,
+        "ing": [
+            "4 heck sausages",
+            "50g flour",
+            "0.5 tsp sunflower oil",
+            "50ml soy milk",
+            "1.5 tbsp gravy granules",
+            "1 egg",
+            "75g potato"
+        ],
+        "inst": "(Ingredients mapped to 1 portion). Heat 180C. Heat oil in dish, cook sausages 10m. Whisk egg, flour, milk for batter. Pour batter around sausages. Roast diced potato on separate tray. Cook both 25m. Serve with gravy."
+    },
+    {
+        "id": 31,
+        "title": "Quesadillas",
+        "cat": "Burgers & Wraps",
+        "pro": 35,
+        "cal": 400,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "100g turkey mince",
+            "1 onion",
+            "1 tsp garlic granules",
+            "1 tsp chilli powder",
+            "0.5 can tinned tomato",
+            "20g cheddar light",
+            "2 mini tortilla wraps"
+        ],
+        "inst": "Fry diced onion and garlic. Season mince with chilli, cook. Stir in tomatoes. Remove mix. Heat wrap, add half mix and cheese, fold and flip to crisp. Repeat."
+    },
+    {
+        "id": 32,
+        "title": "Pepperoni Calzone",
+        "cat": "Beef",
+        "pro": 32,
+        "cal": 410,
+        "time": 35,
+        "serves": 1,
+        "ing": [
+            "70g self-raising flour",
+            "40g fat free natural yoghurt",
+            "62g eat lean protein cheese",
+            "9 slices pepperoni",
+            "1 tbsp tomato puree"
+        ],
+        "inst": "Mix flour and yoghurt to dough. Roll into circle. Layer pepperoni, cheese, tomato puree on one half. Fold, press edges with fork. Create 3 slits on top. Cook 180C for 25-30 mins."
+    },
+    {
+        "id": 33,
+        "title": "Hunters Chicken",
+        "cat": "Chicken",
+        "pro": 40,
+        "cal": 420,
+        "time": 35,
+        "serves": 1,
+        "ing": [
+            "100g chicken",
+            "2 tbsp BBQ sauce",
+            "2 smoked streaky rashers bacon",
+            "15g low fat cheddar cheese",
+            "125g potato"
+        ],
+        "inst": "Dice potato. Wrap bacon around chicken. Cook 180C with chips for 25-30 mins. Pour BBQ sauce over chicken, sprinkle cheese. Cook 5-8 mins further."
+    },
+    {
+        "id": 34,
+        "title": "Big Mac",
+        "cat": "Burgers & Wraps",
+        "pro": 32,
+        "cal": 410,
+        "time": 25,
+        "serves": 1,
+        "ing": [
+            "100g 5% beef mince",
+            "1 seeded burger bun",
+            "15g iceberg lettuce",
+            "2 lighter cheese slices",
+            "1 tbsp light mayonnaise",
+            "1 tsp ketchup",
+            "0.5 tsp white wine vinegar",
+            "5g gherkins",
+            "68g potato"
+        ],
+        "inst": "Mould mince into burger, cook. Cover with cheese slices. Sauce: mix mayo, ketchup, vinegar. Add burger, sauce, salad to bun. Serve with chips."
+    },
+    {
+        "id": 35,
+        "title": "Beef Stroganoff",
+        "cat": "Beef",
+        "pro": 35,
+        "cal": 440,
+        "time": 25,
+        "serves": 1,
+        "ing": [
+            "1 beef stock cube",
+            "1 onion",
+            "100g mushrooms",
+            "120g steak pieces",
+            "3 tsp Dijon mustard",
+            "25g reduced fat sour cream",
+            "46g tagliatelle pasta",
+            "1 tsp garlic",
+            "1 tsp paprika",
+            "1 tbsp tomato puree"
+        ],
+        "inst": "Dice onion, mushrooms, cook with steak. Stir in garlic, tomato, paprika. Boil stock, add to pan with mustard. Simmer 5 mins to thicken. Stir in sour cream. Serve on boiled pasta."
+    },
+    {
+        "id": 36,
+        "title": "London Pizza",
+        "cat": "Vegetarian & Other",
+        "pro": 28,
+        "cal": 390,
+        "time": 35,
+        "serves": 1,
+        "ing": [
+            "50g plain flour",
+            "35g fat free Greek yoghurt",
+            "70g eat lean protein cheese",
+            "3 tbsp tomato puree",
+            "70g potato",
+            "1 tsp garlic",
+            "1 tbsp low fat mayo"
+        ],
+        "inst": "Slice potato to chips, fry light. Mix flour and yoghurt to dough. Roll out base. Spread puree, sprinkle cheese. Cook 180C with chips 25-30 mins. Mix garlic and mayo, spread over pizza."
+    },
+    {
+        "id": 37,
+        "title": "Doner Kebab",
+        "cat": "Beef",
+        "pro": 35,
+        "cal": 410,
+        "time": 240,
+        "serves": 2,
+        "ing": [
+            "125g lean lamb mince",
+            "0.5 tbsp garlic",
+            "0.5 tbsp oregano",
+            "1 white pitta bread",
+            "1 handful Lettuce and red cabbage"
+        ],
+        "inst": "(Ingredients mapped to 1 portion). Rub seasoning into meat, mould into loaf. Cover tray with baking paper. Cook 4 hours at 100C (or quicker at higher temp). Serve in pitta with salad."
+    },
+    {
+        "id": 38,
+        "title": "Meatball Marinara",
+        "cat": "Burgers & Wraps",
+        "pro": 33,
+        "cal": 430,
+        "time": 30,
+        "serves": 1,
+        "ing": [
+            "112g 5% beef mince",
+            "0.5 can tinned tomatoes",
+            "1 tsp paprika",
+            "1 tsp garlic granules",
+            "1 slice low fat cheese slice",
+            "1 crusty white baguette"
+        ],
+        "inst": "Season mince with paprika/garlic, roll into meatballs. Cook 180C for 20-25 mins. Heat tomato, add meatballs. Slice cheese, place on bread, melt. Top with meatballs."
+    },
+    {
+        "id": 39,
+        "title": "Corned Beef Panacalty",
+        "cat": "Beef",
+        "pro": 25,
+        "cal": 360,
+        "time": 45,
+        "serves": 2,
+        "ing": [
+            "2 slices British Corned Beef",
+            "2 bacon medallions",
+            "200g potato",
+            "0.5 onion",
+            "1 tbsp gravy granules"
+        ],
+        "inst": "(Ingredients mapped to 1 portion). Slice potatoes thinly. Dice onion and bacon. Layer potatoes, onions, bacon, corned beef 3 times. Mix gravy, pour over. Cook 180C for 30-40 mins."
+    },
+    {
+        "id": 40,
+        "title": "Popcorn Chicken",
+        "cat": "Chicken",
+        "pro": 42,
+        "cal": 390,
+        "time": 35,
+        "serves": 1,
+        "ing": [
+            "16g plain flour",
+            "1 tsp salt",
+            "1 tsp oregano",
+            "1 tsp garlic powder",
+            "1 tsp smoked paprika",
+            "1 tsp white pepper",
+            "1 tbsp southern fried seasoning",
+            "1 egg white",
+            "150g chicken mince",
+            "160g potato",
+            "1 tbsp gravy granules"
+        ],
+        "inst": "Slice potato to wedges. Mix dry ingredients. Roll chicken mince into popcorn pieces. Roll in egg white then flour mix. Cook wedges and chicken 180C for 25-30 mins. Serve with gravy."
+    },
+    {
+        "id": 41,
+        "title": "Sweet and Sour Chicken",
+        "cat": "Chicken",
+        "pro": 38,
+        "cal": 410,
+        "time": 25,
+        "serves": 1,
+        "ing": [
+            "134g chicken",
+            "1 tbsp soy sauce light",
+            "1 tbsp white wine vinegar",
+            "1 tbsp ketchup",
+            "1 tsp garlic",
+            "1 tsp chilli powder",
+            "10g pineapple",
+            "38g basmati rice",
+            "1 pepper"
+        ],
+        "inst": "Mix 150ml cold water, soy sauce, vinegar, ketchup. Dice chicken and pepper, cook with garlic and chilli. Add liquid mix, stir well. Thicken until tender. Serve on rice, top with pineapple."
+    },
+    {
+        "id": 42,
+        "title": "Chicken & Mushroom Pie",
+        "cat": "Chicken",
+        "pro": 32,
+        "cal": 460,
+        "time": 35,
+        "serves": 1,
+        "ing": [
+            "1 sheet puff pastry",
+            "1 tbsp dijon mustard",
+            "1 tbsp garlic powder",
+            "1 egg white",
+            "1 tbsp salt",
+            "100g mushrooms",
+            "1 chicken stock cube",
+            "125g chicken",
+            "20ml Crème fraiche"
+        ],
+        "inst": "Season chicken with garlic/salt, cook, remove. Cook mushrooms. Add mustard, boiled stock, chicken, crème fraiche. Thicken. Add mix to dish, top with pastry. Crimp sides, score top. Brush with egg white. Cook 180C 25 mins."
+    },
+    {
+        "id": 43,
+        "title": "Chicken & Vegetable Soup",
+        "cat": "Chicken",
+        "pro": 34,
+        "cal": 320,
+        "time": 40,
+        "serves": 1,
+        "ing": [
+            "2 chicken stock cubes",
+            "0.5 can tinned tomatoes",
+            "1 carrot",
+            "0.5 celery stick",
+            "0.5 onion",
+            "1 tsp olive oil",
+            "1 tbsp salt",
+            "1 tbsp pepper",
+            "1 tsp parsley",
+            "125g chicken",
+            "1 bread roll"
+        ],
+        "inst": "Season chicken, cook, set aside. Dice veg, saute 2-3 mins. Add tomatoes, stock, chicken. Boil, simmer 25-30 mins. Top with parsley. Serve with warm roll."
+    },
+    {
+        "id": 44,
+        "title": "Chicken & Stuffing Bun",
+        "cat": "Burgers & Wraps",
+        "pro": 34,
+        "cal": 390,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "112g chicken",
+            "0.25 pack stuffing",
+            "1 Stottie bun",
+            "2 tbsp gravy granules"
+        ],
+        "inst": "Cook chicken thoroughly. Cook stuffing according to instructions. Serve chicken and stuffing in stottie, top with gravy."
+    },
+    {
+        "id": 45,
+        "title": "Nando's Halloumi Chicken",
+        "cat": "Chicken",
+        "pro": 42,
+        "cal": 440,
+        "time": 25,
+        "serves": 1,
+        "ing": [
+            "20g Nando's Peri Peri sauce",
+            "1 tbsp honey",
+            "125g chicken",
+            "28g lighter Cypriot grilling cheese",
+            "100g potato",
+            "1 pinch Peri Peri Salt"
+        ],
+        "inst": "Slice potato to wedges, cover in peri salt. Create 4 slits in chicken, insert halloumi. Mix sauce with honey, brush over. Air fry chicken 16-18m at 180C, chips 8-10m."
+    },
+    {
+        "id": 46,
+        "title": "Chicken Thigh Gyros",
+        "cat": "Burgers & Wraps",
+        "pro": 35,
+        "cal": 460,
+        "time": 40,
+        "serves": 1,
+        "ing": [
+            "1 tsp ground cumin",
+            "1 tsp ground coriander",
+            "2 tsp smoked paprika",
+            "1 tsp chilli flakes",
+            "1 tsp salt",
+            "1 tbsp lemon juice",
+            "115g chicken thighs",
+            "1 folded flat bread",
+            "100g potato",
+            "75g fat free Greek yoghurt",
+            "1 tbsp garlic granules"
+        ],
+        "inst": "Marinate chicken in spices/lemon 1hr. Skewer chicken, air fry 170C 25-30m. Slice potatoes to chips, air fry 180C 12-15m. Mix garlic/yoghurt. Serve kebabs, chips, flatbread, sauce."
+    },
+    {
+        "id": 47,
+        "title": "Nando's Butterfly Chicken Burger",
+        "cat": "Burgers & Wraps",
+        "pro": 36,
+        "cal": 430,
+        "time": 25,
+        "serves": 1,
+        "ing": [
+            "100g chicken",
+            "15g Nando's sauce",
+            "15g halloumi light",
+            "1 small Ciabatta bun",
+            "75g potato",
+            "1 pinch Peri peri salt"
+        ],
+        "inst": "Marinate chicken. Slice potato, cover with peri salt. Air fry chips 180C 15-20m. Air fry chicken 190C 20m, adding halloumi halfway. Toast ciabatta 10m. Assemble burger."
+    },
+    {
+        "id": 48,
+        "title": "Dominos BBQ Stuffed Crust",
+        "cat": "Chicken",
+        "pro": 38,
+        "cal": 450,
+        "time": 35,
+        "serves": 1,
+        "ing": [
+            "2 light Baby Bell",
+            "12g low fat mature grated cheese",
+            "15ml BBQ sauce",
+            "68g chicken",
+            "65g self-raising flour",
+            "65g fat free Greek yoghurt",
+            "1 pepper"
+        ],
+        "inst": "Mix flour/yoghurt to dough, chill 15m. Cook chicken and peppers. Roll base. Slice baby bells, line edges, roll base over cheese. Spread BBQ sauce, top with cheese, chicken, peppers. Cook 180C 15-20m."
+    },
+    {
+        "id": 49,
+        "title": "Feta & Sundried Tomato Pasta",
+        "cat": "Vegetarian & Other",
+        "pro": 22,
+        "cal": 410,
+        "time": 25,
+        "serves": 2,
+        "ing": [
+            "25g feta",
+            "100g chicken",
+            "34g sundried tomatos",
+            "62.5g pasta",
+            "0.5 tsp oregano"
+        ],
+        "inst": "(Ingredients mapped to 1 portion). Air fry feta and tomatoes with oregano 180C 20m. Cook diced chicken, mix with feta sauce. Boil pasta, combine all."
+    },
+    {
+        "id": 50,
+        "title": "Five Guys",
+        "cat": "Burgers & Wraps",
+        "pro": 38,
+        "cal": 450,
+        "time": 15,
+        "serves": 1,
+        "ing": [
+            "2 grill guys burgers",
+            "1 low fat cheese slice",
+            "1 seeded burger bun",
+            "1 handful Lettuce",
+            "1 tbsp tomato sauce"
+        ],
+        "inst": "Fry burgers. Top with cheese slice to melt. Serve in bun with salad and sauce."
+    },
+    {
+        "id": 51,
+        "title": "Cottage Pie",
+        "cat": "Beef",
+        "pro": 33,
+        "cal": 420,
+        "time": 25,
+        "serves": 2,
+        "ing": [
+            "125g 5% beef mince",
+            "15g light medium cheddar",
+            "0.5 pack microwave mashed potato",
+            "1.5 tbsp gravy granules"
+        ],
+        "inst": "(Ingredients mapped to 1 portion). Cook mince. Prepare gravy, mix with mince. Microwave mash, whisk. Layer mince, then mash in dish. Top with cheese, cook 180C 10-12m."
+    },
+    {
+        "id": 52,
+        "title": "Lasagne Burrito",
+        "cat": "Burgers & Wraps",
+        "pro": 32,
+        "cal": 430,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "1 tortilla wrap",
+            "1 lasagne sheet",
+            "37g lasagne white sauce",
+            "15g reduced fat cheddar",
+            "135g 5% beef mince",
+            "2 tbsp tomato puree"
+        ],
+        "inst": "Cook mince, mix in puree. Place mix in center of wrap. Snap lasagne sheet, place half on mince. Top with white sauce, cheddar, remaining sheet, sauce, cheddar. Fold. Air fry 180C 10m."
+    },
+    {
+        "id": 53,
+        "title": "Lamb Flatbread",
+        "cat": "Burgers & Wraps",
+        "pro": 35,
+        "cal": 440,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "100g lamb",
+            "1 Greek style flatbread",
+            "80g fat free Greek yoghurt",
+            "1 handful mint leaves",
+            "1 tbsp garlic"
+        ],
+        "inst": "Marinate lamb in 20g yoghurt, salt, pepper. Mix remaining yoghurt with mint and garlic. Cook lamb thoroughly. Serve on flatbread topped with sauce."
+    },
+    {
+        "id": 54,
+        "title": "Stuffed Chicken Breast",
+        "cat": "Chicken",
+        "pro": 42,
+        "cal": 390,
+        "time": 25,
+        "serves": 1,
+        "ing": [
+            "100g chicken",
+            "3 slices Parma ham",
+            "100g Philadelphia light",
+            "1 tbsp parsley",
+            "150g baby potato's"
+        ],
+        "inst": "Mix Philadelphia with parsley. Pocket chicken breast, stuff it. Wrap chicken in Parma ham. Air fry 200C 15 mins. Air fry baby potatoes 180C 20 mins."
+    },
+    {
+        "id": 55,
+        "title": "Chilli Loaded Nachos",
+        "cat": "Beef",
+        "pro": 30,
+        "cal": 430,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "100g 5% beef mince",
+            "1 can tinned tomatoes",
+            "2 tbsp kidney beans",
+            "1 tbsp chilli powder",
+            "50g lightly salted tortilla chips",
+            "10g light natural cheddar",
+            "25g sour cream"
+        ],
+        "inst": "Season mince with chilli, brown. Stir in tomatoes and beans. Line tray, pour chips, top with chilli, cheese, sour cream. Cook 180C 10-12m until melted."
+    },
+    {
+        "id": 56,
+        "title": "Salt & Chilli Flatbread",
+        "cat": "Chicken",
+        "pro": 40,
+        "cal": 410,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "2 Roosters chicken skewers",
+            "1 high protein flame baked flatbread",
+            "1 large portion salad",
+            "50g fat free Greek yoghurt",
+            "25g cucumber",
+            "1 tsp garlic"
+        ],
+        "inst": "Cook skewers and flatbread per instructions. Mix grated cucumber, garlic, yoghurt for tzatziki. Serve skewers on flatbread with salad and sauce."
+    },
+    {
+        "id": 57,
+        "title": "Curried Noodles",
+        "cat": "Chicken",
+        "pro": 32,
+        "cal": 380,
+        "time": 15,
+        "serves": 1,
+        "ing": [
+            "0.5 pack protein noodles",
+            "80g Mushroom stir-fry",
+            "70g chicken",
+            "3 tbsp Mayflower curry powder"
+        ],
+        "inst": "Dice chicken, cook with stir fry. Add noodles for a few mins. Mix curry powder with boiling water. Toss sauce with chicken and noodles."
+    },
+    {
+        "id": 58,
+        "title": "Filled Yorkshire Pudding",
+        "cat": "Beef",
+        "pro": 34,
+        "cal": 420,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "1 giant Yorkshire pudding",
+            "125g 5% beef mince",
+            "2 tbsp gravy granules",
+            "20g carrots"
+        ],
+        "inst": "Cook mince. Prepare gravy and carrots, mix with mince. Cook Yorkshire per instructions. Fill with mince mix and serve."
+    },
+    {
+        "id": 59,
+        "title": "Sunday Dinner",
+        "cat": "Chicken",
+        "pro": 35,
+        "cal": 410,
+        "time": 25,
+        "serves": 1,
+        "ing": [
+            "100g chicken",
+            "100g potato",
+            "50g red cabbage",
+            "40g parsnips",
+            "40g carrots",
+            "1 aunt Bessy's Yorkshire pudding",
+            "1 tbsp gravy granules"
+        ],
+        "inst": "Cook chicken 15-20m. Add Yorkshire last 4m. Roast potatoes/parsnips 180C 20m. Cook cabbage 8-10m. Boil carrots. Plate and top with gravy."
+    },
+    {
+        "id": 60,
+        "title": "Philly Cheese Steak",
+        "cat": "Beef",
+        "pro": 38,
+        "cal": 450,
+        "time": 20,
+        "serves": 1,
+        "ing": [
+            "30g reduced fat cheddar",
+            "1 Cheese and herb sub roll",
+            "100g steak pieces",
+            "1 onion",
+            "1 tsp Worchester sauce",
+            "1 tsp olive oil"
+        ],
+        "inst": "Fry onion soft. Cook steak brown. Add Worchester sauce. Slice bun, add steak mix, top with cheese. Air fry 2-3m to melt."
+    }
+]
