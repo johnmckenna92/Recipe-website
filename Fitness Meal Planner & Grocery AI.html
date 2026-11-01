@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Meal Planner & Grocery AI</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid fa-dumbbell text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight">MacroChef AI</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Fitness Meal Planner & UK Grocery</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <!-- Theme Toggle -->
+                <button id="themeToggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" aria-label="Toggle Theme">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline"></i>
+                </button>
+
+                <!-- Meal Plan Basket Drawer Trigger -->
+                <button id="openDrawer" class="relative flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-medium shadow-lg shadow-brand-500/25 transition">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                    <span class="hidden sm:inline">Meal Plan</span>
+                    <span id="mealCountBadge" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-500 text-white rounded-full text-xs font-bold flex items-center justify-center shadow-md">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Hero / Search & Filters Bar -->
+        <section class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700/80 space-y-4">
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <!-- Search input -->
+                <div class="relative w-full md:w-96">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Search by name or ingredient (e.g., chicken, oats)..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm">
+                </div>
+
+                <!-- Sort & Category Controls -->
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+                    <div class="flex items-center space-x-2">
+                        <label class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sort by:</label>
+                        <select id="sortBy" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="default">Default</option>
+                            <option value="protein-desc">Highest Protein</option>
+                            <option value="calories-asc">Lowest Calories</option>
+                            <option value="time-asc">Quickest Prep</option>
+                        </select>
+                    </div>
+
+                    <button id="resetFilters" class="px-3 py-2 text-sm font-medium rounded-xl bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                        <i class="fa-solid fa-rotate-right mr-1.5"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category Filter Pills -->
+            <div id="categoryFilters" class="flex items-center gap-2 overflow-x-auto pb-1 pt-1 scrollbar-none">
+                <!-- Dynamically populated category buttons -->
+            </div>
+        </section>
+
+        <!-- Recipes Grid (Minimalist Metric Tiles) -->
+        <section>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-utensils text-brand-500"></i> Recipe Catalog
+                </h2>
+                <span id="recipeCount" class="text-xs font-medium px-2.5 py-1 bg-slate-200 dark:bg-slate-700 rounded-full text-slate-600 dark:text-slate-300">0 recipes</span>
+            </div>
+            
+            <div id="recipeGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Recipe Cards rendered dynamically -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
+        <p>Fitness Meal Planner & Grocery AI &bull; Built with Tailwind CSS & UK Supermarket Optimization</p>
+    </footer>
+
+    <!-- Meal Plan Basket & Grocery Drawer Overlay -->
+    <div id="drawerOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden transition-opacity opacity-0"></div>
+
+    <!-- Sliding Drawer -->
+    <div id="drawer" class="fixed inset-y-0 right-0 max-w-md w-full bg-white dark:bg-slate-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <!-- Drawer Header -->
+        <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-basket-shopping text-brand-500 text-lg"></i>
+                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">Your Meal Plan & Groceries</h3>
+            </div>
+            <button id="closeDrawer" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Drawer Tabs -->
+        <div class="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+            <button id="tabMealPlan" class="flex-1 py-3 text-sm font-semibold text-brand-600 dark:text-brand-400 border-b-2 border-brand-500 transition">
+                <i class="fa-solid fa-calendar-days mr-1.5"></i> Meal Plan (<span id="drawerMealCount">0</span>)
+            </button>
+            <button id="tabGrocery" class="flex-1 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 border-b-2 border-transparent transition">
+                <i class="fa-solid fa-cart-shopping mr-1.5"></i> Grocery List
+            </button>
+            <button id="tabAI" class="flex-1 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 border-b-2 border-transparent transition">
+                <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> AI Prompts
+            </button>
+        </div>
+
+        <!-- Drawer Body / Content Sections -->
+        <div class="flex-grow overflow-y-auto p-4 space-y-4">
+            
+            <!-- SECTION 1: MEAL PLAN -->
+            <div id="sectionMealPlan" class="space-y-4">
+                <!-- Macro Summary Box -->
+                <div class="bg-brand-50 dark:bg-slate-900/80 border border-brand-100 dark:border-slate-700 rounded-2xl p-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-3 flex items-center justify-between">
+                        <span>Daily Average / Total Macros</span>
+                        <span id="macroItemCount" class="text-[10px] bg-brand-500 text-white px-2 py-0.5 rounded-full">0 items</span>
+                    </h4>
+                    <div class="grid grid-cols-4 gap-2 text-center">
+                        <div class="bg-white dark:bg-slate-800 p-2 rounded-xl shadow-xs border border-slate-100 dark:border-slate-700">
+                            <span class="block text-xs text-slate-400">Calories</span>
+                            <span id="totalCalories" class="font-bold text-sm text-slate-800 dark:text-slate-100">0</span>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-2 rounded-xl shadow-xs border border-slate-100 dark:border-slate-700">
+                            <span class="block text-xs text-slate-400">Protein</span>
+                            <span id="totalProtein" class="font-bold text-sm text-brand-600 dark:text-brand-400">0g</span>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-2 rounded-xl shadow-xs border border-slate-100 dark:border-slate-700">
+                            <span class="block text-xs text-slate-400">Carbs</span>
+                            <span id="totalCarbs" class="font-bold text-sm text-amber-600 dark:text-amber-400">0g</span>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-2 rounded-xl shadow-xs border border-slate-100 dark:border-slate-700">
+                            <span class="block text-xs text-slate-400">Fats</span>
+                            <span id="totalFats" class="font-bold text-sm text-rose-600 dark:text-rose-400">0g</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Meal Items List -->
+                <div id="mealPlanList" class="space-y-3">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- SECTION 2: GROCERY LIST -->
+            <div id="sectionGrocery" class="space-y-4 hidden">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Aggregated ingredients grouped by supermarket aisles:</p>
+                    <button id="copyGroceryBtn" class="px-3 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition flex items-center gap-1.5">
+                        <i class="fa-regular fa-copy"></i> Copy List
+                    </button>
+                </div>
+                <div id="groceryListContainer" class="space-y-4">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- SECTION 3: AI SUPERMARKET OPTIMIZATION PROMPTS -->
+            <div id="sectionAI" class="space-y-4 hidden">
+                <div class="bg-gradient-to-br from-indigo-500/10 to-brand-500/10 border border-indigo-500/20 rounded-2xl p-4 space-y-3">
+                    <h4 class="font-bold text-sm text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> UK Supermarket AI Optimizer
+                    </h4>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Generate a smart prompt based on your current meal plan to feed into ChatGPT, Claude, or your preferred AI assistant to find the best UK supermarket deals (Tesco, Aldi, Sainsbury's, Asda) and bundle discounts.
+                    </p>
+                    <div class="space-y-2">
+                        <label class="text-xs font-medium text-slate-500 dark:text-slate-400">Preferred Supermarket:</label>
+                        <select id="supermarketSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="Aldi">Aldi (Budget / Best Value)</option>
+                            <option value="Tesco">Tesco (Clubcard Savings)</option>
+                            <option value="Sainsbury's">Sainsbury's (Nectar Prices)</option>
+                            <option value="Asda">Asda (Rollbacks)</option>
+                        </select>
+                    </div>
+                    <button id="generateAIPromptBtn" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Generate Optimized Prompt
+                    </button>
+                </div>
+
+                <div id="aiPromptOutputContainer" class="hidden space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Generated Prompt:</span>
+                        <button id="copyAIPromptBtn" class="text-xs text-indigo-600 dark:text-indigo-400 font-medium hover:underline flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Copy Prompt
+                        </button>
+                    </div>
+                    <textarea id="aiPromptTextarea" readonly rows="6" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-700 dark:text-slate-300 focus:outline-none"></textarea>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Drawer Footer Actions -->
+        <div class="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex gap-3">
+            <button id="clearMealPlan" class="flex-1 py-2.5 rounded-xl border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-semibold transition">
+                <i class="fa-solid fa-trash-can mr-1"></i> Clear All
+            </button>
+            <button id="shareMealPlan" class="flex-1 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold shadow-md transition flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-share-nodes"></i> Share Plan
+            </button>
+        </div>
+    </div>
+
+    <!-- Recipe Detail Modal -->
+    <div id="recipeModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-6 relative">
+            <button id="closeModal" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div id="modalContent" class="space-y-6">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Fallback Sheet / Modal -->
+    <div id="shareModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 dark:border-slate-700">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-share-nodes text-brand-500"></i> Share Meal Plan
+                </h3>
+                <button id="closeShareModal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Copy your formatted meal plan summary below to share with your coach or friends:</p>
+            <textarea id="shareTextarea" readonly rows="6" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-700 dark:text-slate-300 focus:outline-none"></textarea>
+            <button id="confirmCopyShare" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                <i class="fa-regular fa-copy"></i> Copy to Clipboard
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification Box -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm font-medium">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-brand-500 text-lg"></i>
+        <span id="toastMessage">Notification message</span>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // Embedded recipes data (Clean minimalist version with NO image dependencies)
+        const recipesData = [
+            {
+                id: "rec-1",
+                title: "High-Protein Garlic Butter Chicken & Rice",
+                category: "High Protein",
+                prepTime: 20,
+                calories: 550,
+                protein: 48,
+                carbs: 45,
+                fats: 16,
+                ingredients: [
+                    { name: "Chicken Breast", amount: 200, unit: "g", aisle: "Meat & Poultry" },
+                    { name: "Basmati Rice (dry)", amount: 70, unit: "g", aisle: "Grains & Pasta" },
+                    { name: "Olive Oil", amount: 10, unit: "ml", aisle: "Oils & Condiments" },
+                    { name: "Garlic Cloves (minced)", amount: 3, unit: "cloves", aisle: "Fresh Produce" },
+                    { name: "Broccoli Florets", amount: 150, unit: "g", aisle: "Fresh Produce" },
+                    { name: "Butter", amount: 10, unit: "g", aisle: "Dairy & Eggs" }
+                ],
+                instructions: [
+                    "Cook Basmati rice in boiling water according to package instructions until tender.",
+                    "Dice chicken breast into bite-sized chunks and season with salt, pepper, and garlic powder.",
+                    "Heat olive oil in a non-stick skillet over medium-high heat. Add chicken and cook for 6-8 minutes until golden and cooked through.",
+                    "Stir in butter and minced garlic during the last minute of cooking for rich flavor.",
+                    "Steam broccoli florets until tender-crisp.",
+                    "Assemble meal into prep containers with rice, garlic chicken, and broccoli."
+                ]
+            },
+            {
+                id: "rec-2",
+                title: "Overnight Berry Protein Oats",
+                category: "Breakfast",
+                prepTime: 5,
+                calories: 420,
+                protein: 35,
+                carbs: 52,
+                fats: 8,
+                ingredients: [
+                    { name: "Rolled Oats", amount: 60, unit: "g", aisle: "Grains & Pasta" },
+                    { name: "Whey Protein Powder (Vanilla)", amount: 30, unit: "g", aisle: "Health & Supplements" },
+                    { name: "Almond Milk (Unsweetened)", amount: 200, unit: "ml", aisle: "Dairy & Plant Milks" },
+                    { name: "Mixed Berries (Frozen or Fresh)", amount: 80, unit: "g", aisle: "Frozen Foods" },
+                    { name: "Chia Seeds", amount: 10, unit: "g", aisle: "Baking & Spices" },
+                    { name: "Honey", amount: 10, unit: "g", aisle: "Oils & Condiments" }
+                ],
+                instructions: [
+                    "In a jar or container, combine rolled oats, chia seeds, and vanilla protein powder.",
+                    "Pour in almond milk and mix thoroughly until no clumps remain.",
+                    "Top with mixed berries and a drizzle of honey.",
+                    "Seal container and refrigerate overnight (at least 4 hours) before eating."
+                ]
+            },
+            {
+                id: "rec-3",
+                title: "Lean Beef & Sweet Potato Mash Bowl",
+                category: "Low Carb / Balanced",
+                prepTime: 25,
+                calories: 490,
+                protein: 42,
+                carbs: 38,
+                fats: 18,
+                ingredients: [
+                    { name: "Lean Minced Beef (5% fat)", amount: 180, unit: "g", aisle: "Meat & Poultry" },
+                    { name: "Sweet Potato", amount: 200, unit: "g", aisle: "Fresh Produce" },
+                    { name: "Spinach", amount: 80, unit: "g", aisle: "Fresh Produce" },
+                    { name: "Olive Oil", amount: 8, unit: "ml", aisle: "Oils & Condiments" },
+                    { name: "Smoked Paprika", amount: 5, unit: "g", aisle: "Baking & Spices" }
+                ],
+                instructions: [
+                    "Peel and cube sweet potato, then boil or microwave until soft enough to mash.",
+                    "Mash sweet potato with a pinch of salt and smoked paprika.",
+                    "Brown lean minced beef in a pan with olive oil, seasoning with salt, pepper, and garlic.",
+                    "Stir fresh spinach into the warm beef until wilted.",
+                    "Serve seasoned beef and spinach over a bed of sweet potato mash."
+                ]
+            },
+            {
+                id: "rec-4",
+                title: "Creamy Greek Yogurt Berry Parfait",
+                category: "Snack / Dessert",
+                prepTime: 5,
+                calories: 310,
+                protein: 28,
+                carbs: 32,
+                fats: 6,
+                ingredients: [
+                    { name: "0% Fat Greek Yogurt", amount: 250, unit: "g", aisle: "Dairy & Eggs" },
+                    { name: "Granola (Low Sugar)", amount: 35, unit: "g", aisle: "Breakfast & Cereals" },
+                    { name: "Strawberries", amount: 100, unit: "g", aisle: "Fresh Produce" },
+                    { name: "Maple Syrup", amount: 10, unit: "ml", aisle: "Oils & Condiments" }
+                ],
+                instructions: [
+                    "Add Greek yogurt to a bowl or glass.",
+                    "Layer with sliced fresh strawberries and low sugar granola.",
+                    "Drizzle maple syrup on top for sweetness and serve immediately."
+                ]
+            },
+            {
+                id: "rec-5",
+                title: "Salmon & Quinoa Green Bowl",
+                category: "High Protein",
+                prepTime: 20,
+                calories: 580,
+                protein: 44,
+                carbs: 40,
+                fats: 24,
+                ingredients: [
+                    { name: "Salmon Fillet", amount: 170, unit: "g", aisle: "Fish & Seafood" },
+                    { name: "Quinoa (dry)", amount: 60, unit: "g", aisle: "Grains & Pasta" },
+                    { name: "Asparagus Spears", amount: 120, unit: "g", aisle: "Fresh Produce" },
+                    { name: "Lemon Juice", amount: 15, unit: "ml", aisle: "Fresh Produce" },
+                    { name: "Olive Oil", amount: 10, unit: "ml", aisle: "Oils & Condiments" }
+                ],
+                instructions: [
+                    "Rinse quinoa and boil in water or vegetable broth for 15 minutes until fluffy.",
+                    "Season salmon fillet with salt, pepper, and fresh lemon juice.",
+                    "Pan-sear salmon in olive oil for 4-5 minutes per side until flaky.",
+                    "Sauté asparagus spears in the same pan until tender-crisp.",
+                    "Serve salmon and asparagus over cooked quinoa."
+                ]
+            },
+            {
+                id: "rec-6",
+                title: "Post-Workout Banana Peanut Butter Smoothie",
+                category: "Breakfast",
+                prepTime: 5,
+                calories: 450,
+                protein: 38,
+                carbs: 50,
+                fats: 12,
+                ingredients: [
+                    { name: "Whey Protein Powder (Chocolate)", amount: 35, unit: "g", aisle: "Health & Supplements" },
+                    { name: "Banana", amount: 120, unit: "g", aisle: "Fresh Produce" },
+                    { name: "Natural Peanut Butter", amount: 25, unit: "g", aisle: "Pantry & Spreads" },
+                    { name: "Semi-Skimmed Milk", amount: 250, unit: "ml", aisle: "Dairy & Plant Milks" },
+                    { name: "Ice Cubes", amount: 4, unit: "units", aisle: "Frozen Foods" }
+                ],
+                instructions: [
+                    "Add milk, chocolate protein powder, banana, peanut butter, and ice cubes into a blender.",
+                    "Blend on high speed for 45 seconds until smooth and creamy.",
+                    "Pour into a shaker bottle or glass and enjoy post-workout."
+                ]
+            }
+        ];
+
+        // Application State
+        let state = {
+            recipes: recipesData,
+            selectedCategory: 'All',
+            searchQuery: '',
+            sortBy: 'default',
+            mealPlan: JSON.parse(localStorage.getItem('macrochef_mealplan')) || [], // array of { recipeId, portions }
+            darkMode: document.documentElement.classList.contains('dark')
+        };
+
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const searchInput = document.getElementById('searchInput');
+        const sortBySelect = document.getElementById('sortBy');
+        const resetFiltersBtn = document.getElementById('resetFilters');
+        const categoryFiltersContainer = document.getElementById('categoryFilters');
+        const recipeGrid = document.getElementById('recipeGrid');
+        const recipeCountSpan = document.getElementById('recipeCount');
+        
+        const openDrawerBtn = document.getElementById('openDrawer');
+        const closeDrawerBtn = document.getElementById('closeDrawer');
+        const drawer = document.getElementById('drawer');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+        const mealCountBadge = document.getElementById('mealCountBadge');
+        const drawerMealCount = document.getElementById('drawerMealCount');
+        
+        const tabMealPlan = document.getElementById('tabMealPlan');
+        const tabGrocery = document.getElementById('tabGrocery');
+        const tabAI = document.getElementById('tabAI');
+        const sectionMealPlan = document.getElementById('sectionMealPlan');
+        const sectionGrocery = document.getElementById('sectionGrocery');
+        const sectionAI = document.getElementById('sectionAI');
+        
+        const mealPlanList = document.getElementById('mealPlanList');
+        const groceryListContainer = document.getElementById('groceryListContainer');
+        const copyGroceryBtn = document.getElementById('copyGroceryBtn');
+        const macroItemCount = document.getElementById('macroItemCount');
+        const totalCaloriesSpan = document.getElementById('totalCalories');
+        const totalProteinSpan = document.getElementById('totalProtein');
+        const totalCarbsSpan = document.getElementById('totalCarbs');
+        const totalFatsSpan = document.getElementById('totalFats');
+        
+        const generateAIPromptBtn = document.getElementById('generateAIPromptBtn');
+        const supermarketSelect = document.getElementById('supermarketSelect');
+        const aiPromptOutputContainer = document.getElementById('aiPromptOutputContainer');
+        const aiPromptTextarea = document.getElementById('aiPromptTextarea');
+        const copyAIPromptBtn = document.getElementById('copyAIPromptBtn');
+        
+        const clearMealPlanBtn = document.getElementById('clearMealPlan');
+        const shareMealPlanBtn = document.getElementById('shareMealPlan');
+        
+        const recipeModal = document.getElementById('recipeModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const modalContent = document.getElementById('modalContent');
+        
+        const shareModal = document.getElementById('shareModal');
+        const closeShareModalBtn = document.getElementById('closeShareModal');
+        const shareTextarea = document.getElementById('shareTextarea');
+        const confirmCopyShareBtn = document.getElementById('confirmCopyShare');
+        
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+
+        // Initialize App
+        function initApp() {
+            setupTheme();
+            renderCategories();
+            filterAndRenderRecipes();
+            updateDrawerBadge();
+            setupEventListeners();
+        }
+
+        // Theme management
+        function setupTheme() {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const storedTheme = localStorage.getItem('macrochef_theme');
+            if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                state.darkMode = true;
+            } else {
+                document.documentElement.classList.remove('dark');
+                state.darkMode = false;
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            state.darkMode = document.documentElement.classList.contains('dark');
+            localStorage.setItem('macrochef_theme', state.darkMode ? 'dark' : 'light');
+        });
+
+        // Event Listeners
+        function setupEventListeners() {
+            searchInput.addEventListener('input', (e) => {
+                state.searchQuery = e.target.value.trim().toLowerCase();
+                filterAndRenderRecipes();
+            });
+
+            sortBySelect.addEventListener('change', (e) => {
+                state.sortBy = e.target.value;
+                filterAndRenderRecipes();
+            });
+
+            resetFiltersBtn.addEventListener('click', () => {
+                state.searchQuery = '';
+                state.selectedCategory = 'All';
+                searchInput.value = '';
+                sortBySelect.value = 'default';
+                filterAndRenderRecipes();
+            });
+
+            // Drawer controls
+            openDrawerBtn.addEventListener('click', toggleDrawer);
+            closeDrawerBtn.addEventListener('click', toggleDrawer);
+            drawerOverlay.addEventListener('click', toggleDrawer);
+
+            // Drawer tabs
+            tabMealPlan.addEventListener('click', () => switchDrawerTab('mealplan'));
+            tabGrocery.addEventListener('click', () => {
+                switchDrawerTab('grocery');
+                renderGroceryList();
+            });
+            tabAI.addEventListener('click', () => switchDrawerTab('ai'));
+
+            // Modal controls
+            closeModalBtn.addEventListener('click', () => recipeModal.classList.add('hidden'));
+            recipeModal.addEventListener('click', (e) => {
+                if (e.target === recipeModal) recipeModal.classList.add('hidden');
+            });
+
+            // Share controls
+            shareMealPlanBtn.addEventListener('click', openShareModal);
+            closeShareModalBtn.addEventListener('click', () => shareModal.classList.add('hidden'));
+            shareModal.addEventListener('click', (e) => {
+                if (e.target === shareModal) shareModal.classList.add('hidden');
+            });
+            confirmCopyShareBtn.addEventListener('click', copyShareText);
+
+            clearMealPlanBtn.addEventListener('click', clearMealPlan);
+            copyGroceryBtn.addEventListener('click', copyGroceryList);
+
+            generateAIPromptBtn.addEventListener('click', generateAIPrompt);
+            copyAIPromptBtn.addEventListener('click', copyAIPrompt);
+        }
+
+        // Render Categories
+        function renderCategories() {
+            const categories = ['All', ...new Set(recipesData.map(r => r.category))];
+            categoryFiltersContainer.innerHTML = categories.map(cat => `
+                <button onclick="selectCategory('${cat}')" class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${state.selectedCategory === cat ? 'bg-brand-500 text-white shadow-md shadow-brand-500/25' : 'bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        window.selectCategory = function(cat) {
+            state.selectedCategory = cat;
+            renderCategories();
+            filterAndRenderRecipes();
+        };
+
+        // Filter and Render Recipes (Minimalist Metric Tiles)
+        function filterAndRenderRecipes() {
+            let filtered = [...state.recipes];
+
+            // Category filter
+            if (state.selectedCategory !== 'All') {
+                filtered = filtered.filter(r => r.category === state.selectedCategory);
+            }
+
+            // Search query filter (Name or Ingredients)
+            if (state.searchQuery) {
+                filtered = filtered.filter(r => 
+                    r.title.toLowerCase().includes(state.searchQuery) ||
+                    r.ingredients.some(ing => ing.name.toLowerCase().includes(state.searchQuery))
+                );
+            }
+
+            // Sorting
+            if (state.sortBy === 'protein-desc') {
+                filtered.sort((a, b) => b.protein - a.protein);
+            } else if (state.sortBy === 'calories-asc') {
+                filtered.sort((a, b) => a.calories - b.calories);
+            } else if (state.sortBy === 'time-asc') {
+                filtered.sort((a, b) => a.prepTime - b.prepTime);
+            }
+
+            recipeCountSpan.textContent = `${filtered.length} recipe${filtered.length === 1 ? '' : 's'}`;
+
+            if (filtered.length === 0) {
+                recipeGrid.innerHTML = `
+                    <div class="col-span-full py-12 text-center space-y-3">
+                        <i class="fa-solid fa-utensils text-4xl text-slate-300 dark:text-slate-600"></i>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">No recipes match your search criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            recipeGrid.innerHTML = filtered.map(recipe => `
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200/80 dark:border-slate-700/80 hover:shadow-md transition flex flex-col justify-between space-y-5">
+                    <!-- Top Title & Category -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-lg">
+                                ${recipe.category}
+                            </span>
+                            <div class="flex items-center text-xs text-slate-400 gap-1 font-medium">
+                                <i class="fa-regular fa-clock"></i> ${recipe.prepTime} mins
+                            </div>
+                        </div>
+                        <h3 onclick="openRecipeModal('${recipe.id}')" class="font-bold text-base text-slate-800 dark:text-slate-100 hover:text-brand-500 cursor-pointer transition line-clamp-1">
+                            ${recipe.title}
+                        </h3>
+                    </div>
+
+                    <!-- Minimalist Metric Tiles (Macros Box) -->
+                    <div class="grid grid-cols-4 gap-2 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-100 dark:border-slate-700/60 text-center">
+                        <div>
+                            <span class="block text-[10px] uppercase font-semibold text-slate-400">Cals</span>
+                            <span class="font-bold text-xs text-slate-700 dark:text-slate-200">${recipe.calories}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] uppercase font-semibold text-slate-400">Protein</span>
+                            <span class="font-bold text-xs text-brand-600 dark:text-brand-400">${recipe.protein}g</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] uppercase font-semibold text-slate-400">Carbs</span>
+                            <span class="font-bold text-xs text-amber-600 dark:text-amber-400">${recipe.carbs}g</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] uppercase font-semibold text-slate-400">Fats</span>
+                            <span class="font-bold text-xs text-rose-600 dark:text-rose-400">${recipe.fats}g</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center gap-2 pt-1">
+                        <button onclick="openRecipeModal('${recipe.id}')" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-semibold transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-book-open"></i> View Recipe
+                        </button>
+                        <button onclick="addRecipeToMealPlan('${recipe.id}')" class="py-2.5 px-4 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold shadow-md shadow-brand-500/20 transition flex items-center justify-center gap-1.5" title="Add to Meal Plan">
+                            <i class="fa-solid fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Recipe Detail Modal with Portion Scaling
+        window.openRecipeModal = function(recipeId) {
+            const recipe = state.recipes.find(r => r.id === recipeId);
+            if (!recipe) return;
+
+            let currentScale = 1;
+
+            function renderModalContent() {
+                const scaledCals = Math.round(recipe.calories * currentScale);
+                const scaledProtein = Math.round(recipe.protein * currentScale);
+                const scaledCarbs = Math.round(recipe.carbs * currentScale);
+                const scaledFats = Math.round(recipe.fats * currentScale);
+
+                modalContent.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between pr-8">
+                            <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-lg">
+                                ${recipe.category}
+                            </span>
+                            <div class="flex items-center text-xs text-slate-400 gap-1.5 font-medium">
+                                <i class="fa-regular fa-clock"></i> ${recipe.prepTime} mins prep
+                            </div>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">${recipe.title}</h2>
+
+                        <!-- Portion Scaler Bar -->
+                        <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Portions / Servings:</span>
+                            <div class="flex items-center space-x-3">
+                                <button onclick="adjustModalScale(-0.5)" class="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 shadow-xs hover:bg-slate-100">-</button>
+                                <span id="modalScaleDisplay" class="font-bold text-sm w-8 text-center">${currentScale}x</span>
+                                <button onclick="adjustModalScale(0.5)" class="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 shadow-xs hover:bg-slate-100">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Scaled Metric Tiles -->
+                        <div class="grid grid-cols-4 gap-3 bg-brand-50/50 dark:bg-slate-900/60 p-4 rounded-2xl border border-brand-100 dark:border-slate-700 text-center">
+                            <div>
+                                <span class="block text-[10px] uppercase font-bold text-slate-400">Calories</span>
+                                <span class="font-bold text-sm text-slate-800 dark:text-slate-100">${scaledCals}</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] uppercase font-bold text-slate-400">Protein</span>
+                                <span class="font-bold text-sm text-brand-600 dark:text-brand-400">${scaledProtein}g</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] uppercase font-bold text-slate-400">Carbs</span>
+                                <span class="font-bold text-sm text-amber-600 dark:text-amber-400">${scaledCarbs}g</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] uppercase font-bold text-slate-400">Fats</span>
+                                <span class="font-bold text-sm text-rose-600 dark:text-rose-400">${scaledFats}g</span>
+                            </div>
+                        </div>
+
+                        <!-- Ingredients List -->
+                        <div class="space-y-2">
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                                <i class="fa-solid fa-basket-shopping text-brand-500"></i> Ingredients
+                            </h4>
+                            <ul class="divide-y divide-slate-100 dark:divide-slate-700/60 bg-slate-50 dark:bg-slate-900/40 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
+                                ${recipe.ingredients.map(ing => {
+                                    const scaledAmount = typeof ing.amount === 'number' ? Math.round(ing.amount * currentScale * 10) / 10 : ing.amount;
+                                    return `
+                                        <li class="py-2 first:pt-0 last:pb-0 flex items-center justify-between text-xs">
+                                            <span class="text-slate-700 dark:text-slate-300 font-medium">${ing.name}</span>
+                                            <span class="font-semibold text-brand-600 dark:text-brand-400">${scaledAmount} ${ing.unit}</span>
+                                        </li>
+                                    `;
+                                }).join('')}
+                            </ul>
+                        </div>
+
+                        <!-- Instructions -->
+                        <div class="space-y-2">
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-brand-500"></i> Step-by-Step Instructions
+                            </h4>
+                            <ol class="space-y-2.5">
+                                ${recipe.instructions.map((step, idx) => `
+                                    <li class="flex items-start gap-3 text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <span class="w-5 h-5 rounded-full bg-brand-500 text-white font-bold flex items-center justify-center shrink-0 text-[10px]">${idx + 1}</span>
+                                        <span class="leading-relaxed mt-0.5">${step}</span>
+                                    </li>
+                                `).join('')}
+                            </ol>
+                        </div>
+
+                        <!-- Add to Meal Plan from Modal -->
+                        <button onclick="addRecipeToMealPlanWithScale('${recipe.id}', ${currentScale})" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm rounded-2xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Add ${currentScale} Portion(s) to Meal Plan
+                        </button>
+                    </div>
+                `;
+            }
+
+            window.adjustModalScale = function(delta) {
+                currentScale = Math.max(0.5, Math.min(5, currentScale + delta));
+                renderModalContent();
+            };
+
+            renderModalContent();
+            recipeModal.classList.remove('hidden');
+        };
+
+        // Meal Plan Management
+        window.addRecipeToMealPlan = function(recipeId) {
+            addRecipeToMealPlanWithScale(recipeId, 1);
+        };
+
+        window.addRecipeToMealPlanWithScale = function(recipeId, portions) {
+            const existing = state.mealPlan.find(item => item.recipeId === recipeId);
+            if (existing) {
+                existing.portions += portions;
+            } else {
+                state.mealPlan.push({ recipeId, portions });
+            }
+            saveAndSyncMealPlan();
+            recipeModal.classList.add('hidden');
+            showToast('Added recipe to your meal plan!');
+        };
+
+        window.removeMealPlanItem = function(index) {
+            state.mealPlan.splice(index, 1);
+            saveAndSyncMealPlan();
+            showToast('Removed item from meal plan.');
+        };
+
+        window.updateMealPlanPortions = function(index, delta) {
+            state.mealPlan[index].portions = Math.max(0.5, Math.round((state.mealPlan[index].portions + delta) * 10) / 10);
+            saveAndSyncMealPlan();
+        };
+
+        function saveAndSyncMealPlan() {
+            localStorage.setItem('macrochef_mealplan', JSON.stringify(state.mealPlan));
+            updateDrawerBadge();
+            renderMealPlanDrawer();
+        }
+
+        function updateDrawerBadge() {
+            const totalCount = state.mealPlan.reduce((acc, item) => acc + item.portions, 0);
+            mealCountBadge.textContent = totalCount;
+            drawerMealCount.textContent = totalCount;
+            
+            if (totalCount > 0) {
+                mealCountBadge.classList.remove('hidden');
+            } else {
+                mealCountBadge.classList.add('hidden');
+            }
+        }
+
+        function toggleDrawer() {
+            const isOpen = drawer.classList.contains('translate-x-full');
+            if (isOpen) {
+                drawer.classList.remove('translate-x-full');
+                drawerOverlay.classList.remove('hidden');
+                setTimeout(() => drawerOverlay.classList.remove('opacity-0'), 10);
+                renderMealPlanDrawer();
+            } else {
+                drawer.classList.add('translate-x-full');
+                drawerOverlay.classList.add('opacity-0');
+                setTimeout(() => drawerOverlay.classList.add('hidden'), 300);
+            }
+        }
+
+        function switchDrawerTab(tab) {
+            tabMealPlan.className = "flex-1 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 border-b-2 border-transparent transition";
+            tabGrocery.className = "flex-1 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 border-b-2 border-transparent transition";
+            tabAI.className = "flex-1 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 border-b-2 border-transparent transition";
+            
+            sectionMealPlan.classList.add('hidden');
+            sectionGrocery.classList.add('hidden');
+            sectionAI.classList.add('hidden');
+
+            if (tab === 'mealplan') {
+                tabMealPlan.className = "flex-1 py-3 text-sm font-semibold text-brand-600 dark:text-brand-400 border-b-2 border-brand-500 transition";
+                sectionMealPlan.classList.remove('hidden');
+            } else if (tab === 'grocery') {
+                tabGrocery.className = "flex-1 py-3 text-sm font-semibold text-brand-600 dark:text-brand-400 border-b-2 border-brand-500 transition";
+                sectionGrocery.classList.remove('hidden');
+            } else if (tab === 'ai') {
+                tabAI.className = "flex-1 py-3 text-sm font-semibold text-brand-600 dark:text-brand-400 border-b-2 border-brand-500 transition";
+                sectionAI.classList.remove('hidden');
+            }
+        }
+
+        function renderMealPlanDrawer() {
+            if (state.mealPlan.length === 0) {
+                macroItemCount.textContent = '0 items';
+                totalCaloriesSpan.textContent = '0';
+                totalProteinSpan.textContent = '0g';
+                totalCarbsSpan.textContent = '0g';
+                totalFatsSpan.textContent = '0g';
+
+                mealPlanList.innerHTML = `
+                    <div class="py-12 text-center space-y-2">
+                        <i class="fa-solid fa-basket-shopping text-3xl text-slate-300 dark:text-slate-600"></i>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Your meal plan is currently empty. Add recipes from the catalog!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let totalCals = 0;
+            let totalProt = 0;
+            let totalCarb = 0;
+            let totalFat = 0;
+
+            mealPlanList.innerHTML = state.mealPlan.map((item, idx) => {
+                const recipe = state.recipes.find(r => r.id === item.recipeId);
+                if (!recipe) return '';
+
+                const cals = Math.round(recipe.calories * item.portions);
+                const prot = Math.round(recipe.protein * item.portions);
+                const carb = Math.round(recipe.carbs * item.portions);
+                const fat = Math.round(recipe.fats * item.portions);
+
+                totalCals += cals;
+                totalProt += prot;
+                totalCarb += carb;
+                totalFat += fat;
+
+                return `
+                    <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
+                        <div class="min-w-0 flex-1">
+                            <h5 class="font-bold text-xs text-slate-800 dark:text-slate-100 truncate">${recipe.title}</h5>
+                            <span class="text-[10px] text-slate-400">${cals} kcal &bull; P: ${prot}g &bull; C: ${carb}g &bull; F: ${fat}g</span>
+                        </div>
+                        <div class="flex items-center space-x-2 shrink-0">
+                            <div class="flex items-center space-x-1 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+                                <button onclick="updateMealPlanPortions(${idx}, -0.5)" class="text-xs font-bold text-slate-500 hover:text-brand-500">-</button>
+                                <span class="text-xs font-bold w-6 text-center">${item.portions}x</span>
+                                <button onclick="updateMealPlanPortions(${idx}, 0.5)" class="text-xs font-bold text-slate-500 hover:text-brand-500">+</button>
+                            </div>
+                            <button onclick="removeMealPlanItem(${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 transition">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            macroItemCount.textContent = `${state.mealPlan.length} recipe${state.mealPlan.length === 1 ? '' : 's'}`;
+            totalCaloriesSpan.textContent = totalCals;
+            totalProteinSpan.textContent = totalProt + 'g';
+            totalCarbsSpan.textContent = totalCarb + 'g';
+            totalFatsSpan.textContent = totalFat + 'g';
+        }
+
+        // Grocery List Generator (Aggregated UK Supermarket Aisles)
+        function renderGroceryList() {
+            if (state.mealPlan.length === 0) {
+                groceryListContainer.innerHTML = `
+                    <div class="py-12 text-center space-y-2">
+                        <i class="fa-solid fa-cart-shopping text-3xl text-slate-300 dark:text-slate-600"></i>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Add recipes to your meal plan to generate an aggregated UK supermarket grocery list.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Aggregate ingredients by aisle and name
+            const aisleMap = {};
+
+            state.mealPlan.forEach(item => {
+                const recipe = state.recipes.find(r => r.id === item.recipeId);
+                if (!recipe) return;
+
+                recipe.ingredients.forEach(ing => {
+                    const aisle = ing.aisle || 'General Grocery';
+                    if (!aisleMap[aisle]) {
+                        aisleMap[aisle] = {};
+                    }
+                    
+                    const key = `${ing.name.toLowerCase()}_${ing.unit.toLowerCase()}`;
+                    const numericAmount = typeof ing.amount === 'number' ? ing.amount * item.portions : 0;
+
+                    if (aisleMap[aisle][key]) {
+                        aisleMap[aisle][key].amount += numericAmount;
+                    } else {
+                        aisleMap[aisle][key] = {
+                            name: ing.name,
+                            amount: numericAmount,
+                            unit: ing.unit
+                        };
+                    }
+                });
+            });
+
+            let html = '';
+            for (const [aisle, items] of Object.entries(aisleMap)) {
+                html += `
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 space-y-2">
+                        <h5 class="font-bold text-xs uppercase tracking-wider text-brand-600 dark:text-brand-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-store"></i> ${aisle}
+                        </h5>
+                        <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+                `;
+
+                for (const itemData of Object.values(items)) {
+                    const displayAmount = itemData.amount > 0 ? (Math.round(itemData.amount * 10) / 10) + ' ' + itemData.unit : itemData.unit;
+                    html += `
+                        <li class="py-2 first:pt-0 last:pb-0 flex items-center justify-between text-xs">
+                            <span class="text-slate-700 dark:text-slate-300 font-medium">${itemData.name}</span>
+                            <span class="font-semibold text-slate-500 dark:text-slate-400">${displayAmount}</span>
+                        </li>
+                    `;
+                }
+
+                html += `
+                        </ul>
+                    </div>
+                `;
+            }
+
+            groceryListContainer.innerHTML = html;
+        }
+
+        function copyGroceryList() {
+            let text = "--- UK SUPERMARKET GROCERY LIST ---\n\n";
+            const aisleMap = {};
+
+            state.mealPlan.forEach(item => {
+                const recipe = state.recipes.find(r => r.id === item.recipeId);
+                if (!recipe) return;
+                recipe.ingredients.forEach(ing => {
+                    const aisle = ing.aisle || 'General';
+                    if (!aisleMap[aisle]) aisleMap[aisle] = {};
+                    const key = `${ing.name}_${ing.unit}`;
+                    const amt = typeof ing.amount === 'number' ? ing.amount * item.portions : 0;
+                    if (aisleMap[aisle][key]) aisleMap[aisle][key].amount += amt;
+                    else aisleMap[aisle][key] = { name: ing.name, amount: amt, unit: ing.unit };
+                });
+            });
+
+            for (const [aisle, items] of Object.entries(aisleMap)) {
+                text += `[ ${aisle.toUpperCase()} ]\n`;
+                for (const i of Object.values(items)) {
+                    text += `- ${i.name}: ${i.amount > 0 ? Math.round(i.amount * 10) / 10 + ' ' + i.unit : i.unit}\n`;
+                }
+                text += '\n';
+            }
+
+            copyToClipboardFallback(text);
+            showToast('Grocery list copied to clipboard!');
+        }
+
+        // AI Supermarket Optimization Prompt Generator
+        function generateAIPrompt() {
+            if (state.mealPlan.length === 0) {
+                showToast('Add recipes to your meal plan first.');
+                return;
+            }
+
+            const supermarket = supermarketSelect.value;
+            let ingredientSummary = "";
+
+            const aisleMap = {};
+            state.mealPlan.forEach(item => {
+                const recipe = state.recipes.find(r => r.id === item.recipeId);
+                if (!recipe) return;
+                recipe.ingredients.forEach(ing => {
+                    const key = ing.name.toLowerCase();
+                    const amt = typeof ing.amount === 'number' ? ing.amount * item.portions : 0;
+                    if (aisleMap[key]) aisleMap[key].amount += amt;
+                    else aisleMap[key] = { name: ing.name, amount: amt, unit: ing.unit };
+                });
+            });
+
+            for (const i of Object.values(aisleMap)) {
+                ingredientSummary += `- ${i.name}: ${i.amount > 0 ? Math.round(i.amount * 10) / 10 + ' ' + i.unit : i.unit}\n`;
+            }
+
+            const prompt = `Act as an expert UK grocery budget and nutrition assistant. Based on my weekly fitness meal plan, I need an optimized shopping list specifically tailored for ${supermarket} (UK). Please review the ingredients below, suggest any current money-saving swaps, recommend multi-buy or Clubcard/Nectar deals if applicable, and estimate the total approximate cost in GBP (£).\n\nIngredients Required:\n${ingredientSummary}`;
+
+            aiPromptTextarea.value = prompt;
+            aiPromptOutputContainer.classList.remove('hidden');
+            showToast('AI Supermarket optimization prompt generated!');
+        }
+
+        function copyAIPrompt() {
+            copyToClipboardFallback(aiPromptTextarea.value);
+            showToast('AI prompt copied to clipboard!');
+        }
+
+        // Sharing Fallback Sheet
+        function openShareModal() {
+            if (state.mealPlan.length === 0) {
+                showToast('Your meal plan is empty.');
+                return;
+            }
+
+            let text = "--- MY FITNESS MEAL PLAN ---\n\n";
+            let totalCals = 0, totalProt = 0, totalCarb = 0, totalFat = 0;
+
+            state.mealPlan.forEach(item => {
+                const recipe = state.recipes.find(r => r.id === item.recipeId);
+                if (!recipe) return;
+                const cals = Math.round(recipe.calories * item.portions);
+                const prot = Math.round(recipe.protein * item.portions);
+                text += `${item.portions}x ${recipe.title} (${cals} kcal, P:${prot}g)\n`;
+                totalCals += cals;
+                totalProt += Math.round(recipe.protein * item.portions);
+                totalCarb += Math.round(recipe.carbs * item.portions);
+                totalFat += Math.round(recipe.fats * item.portions);
+            });
+
+            text += `\nTOTAL DAILY/WEEKLY ESTIMATE:\nCalories: ${totalCals} kcal | Protein: ${totalProt}g | Carbs: ${totalCarb}g | Fats: ${totalFat}g\n\nGenerated via MacroChef AI`;
+
+            shareTextarea.value = text;
+            shareModal.classList.remove('hidden');
+        }
+
+        function copyShareText() {
+            copyToClipboardFallback(shareTextarea.value);
+            shareModal.classList.add('hidden');
+            showToast('Meal plan summary copied to clipboard!');
+        }
+
+        function clearMealPlan() {
+            state.mealPlan = [];
+            saveAndSyncMealPlan();
+            showToast('Meal plan cleared.');
+        }
+
+        // Robust Clipboard Fallback
+        function copyToClipboardFallback(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Clipboard copy failed:', err);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // Toast Notification Helper
+        function showToast(message) {
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Run Init on Window Load
+        window.onload = function() {
+            initApp();
+        };
+    </script>
+</body>
+</html>
