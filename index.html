@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Fitness Booklet | Meal Planner & Grocery AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; }
+        .vis { top: var(--vt, 0px) !important; bottom: auto !important; height: var(--vh, 100dvh) !important; }
+        .drawer-h { height: 85%; }
+        .modal-h { max-height: 92%; }
+        .safe-b { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)); }
+        #toast { position: fixed; left: 50%; top: calc(var(--vt, 0px) + var(--vh, 100dvh) - 150px); transform: translateX(-50%) translateY(10px); background: #334155; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: all .25s; z-index: 100; max-width: 90%; text-align: center; }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .drawer-up { transform: translateY(0); }
+        .drawer-down { transform: translateY(100%); }
+        .modal-open { opacity: 1; pointer-events: auto; transform: scale(1); }
+        .modal-closed { opacity: 0; pointer-events: none; transform: scale(0.95); }
+    </style>
+</head>
+<body class="text-slate-800 pb-16">
+
+    <!-- Header & Top Plan Button -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-black text-slate-900 tracking-tight">Fitness Meals</h1>
+                <p class="text-xs text-slate-500">Select recipes & generate AI lists</p>
+            </div>
+            <button onclick="toggleDrawer(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm flex items-center gap-2">
+                <span aria-hidden="true" style="font-style:normal">🧺</span>
+                <span id="topBadgeCount" class="bg-indigo-800 text-xs px-2 py-0.5 rounded-full">0</span>
+            </button>
+        </div>
+        <div class="max-w-4xl mx-auto px-4 pb-3">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="text-slate-400" aria-hidden="true" style="font-style:normal">🔍</span>
+                </div>
+                <input type="text" id="searchInput" oninput="renderGrid()" placeholder="Search recipes or ingredients..." class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm transition">
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-6">
+        
+        <!-- Filters & Sorting -->
+        <div class="mb-6 space-y-4">
+            <div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Filter by Category</h3>
+                <div class="flex overflow-x-auto gap-2 pb-2 hide-scrollbar" id="categoryFilters"></div>
+            </div>
+            <div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Sort by</h3>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1" id="sortFilters">
+                    <button class="sort-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border border-slate-200 bg-slate-800 text-white" data-sort="default">All</button>
+                    <button class="sort-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border border-slate-200 bg-white text-slate-600" data-sort="protein">Highest Protein</button>
+                    <button class="sort-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border border-slate-200 bg-white text-slate-600" data-sort="calories">Lowest Calories</button>
+                    <button class="sort-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border border-slate-200 bg-white text-slate-600" data-sort="time">Quickest to Make</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipe Grid -->
+        <div id="recipeGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+    </main>
+
+    <!-- Meal Plan Drawer -->
+    <div id="planDrawer" class="vis fixed inset-0 z-50 pointer-events-none">
+        <div class="absolute inset-0 bg-slate-900/40 opacity-0 transition-opacity duration-300" id="drawerBackdrop" onclick="toggleDrawer(false)"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-xl drawer-h flex flex-col drawer-down transition-transform duration-300 ease-out pointer-events-auto" id="drawerContent">
+            
+            <div class="px-4 py-4 border-b border-slate-100 flex justify-between items-center shrink-0">
+                <h2 class="text-xl font-black text-slate-800">Your Meal Plan</h2>
+                <button onclick="toggleDrawer(false)" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200"><span aria-hidden="true" style="font-style:normal">✕</span></button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-4 bg-slate-50">
+                <div id="drawerEmpty" class="text-center text-slate-500 py-10">
+                    <span class="text-4xl text-slate-300 mb-3 block" aria-hidden="true" style="font-style:normal">🧺</span>
+                    <p>No meals selected yet.</p>
+                </div>
+                <div id="drawerList" class="space-y-3"></div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-slate-100 shrink-0 space-y-3 safe-b">
+                <button onclick="sharePlan()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-base">
+                    <span class="mr-2" aria-hidden="true" style="font-style:normal">📤</span> Share Plan & Grocery List
+                </button>
+                <button onclick="generateAIPrompt()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-base">
+                    <span class="mr-2" aria-hidden="true" style="font-style:normal">🤖</span> Copy Supermarket AI Optimizer Prompt
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recipe Modal -->
+    <div id="recipeModal" class="vis fixed inset-0 z-50 flex items-center justify-center p-4 modal-closed transition-all duration-200">
+        <div class="absolute inset-0 bg-slate-900/40 rounded-xl" onclick="closeModal()"></div>
+        <div class="bg-white rounded-2xl w-full max-w-lg modal-h flex flex-col relative z-10 shadow-2xl overflow-hidden">
+            
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
+                <span id="modalCat" class="text-xs font-bold uppercase tracking-wider text-indigo-600"></span>
+                <div class="flex gap-2">
+                    <button onclick="shareCurrentRecipe()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-indigo-600 hover:bg-slate-100 shadow-sm transition text-sm" title="Share Recipe">
+                        <span aria-hidden="true" style="font-style:normal">📤</span>
+                    </button>
+                    <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-100 shadow-sm transition text-sm">
+                        <span aria-hidden="true" style="font-style:normal">✕</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-5 py-4">
+                <h2 id="modalTitle" class="text-2xl font-black text-slate-800 leading-tight mb-3"></h2>
+                
+                <div class="flex flex-wrap gap-2 mb-6" id="modalBadges"></div>
+                
+                <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <div>
+                        <span class="font-bold text-slate-700 block">Scale Ingredients</span>
+                        <span class="text-xs text-slate-400">Cooking for more? Adjust here.</span>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 shadow-sm">
+                        <button class="w-8 h-8 rounded text-slate-500 hover:bg-slate-100 transition font-bold text-base" onclick="updateModalPortions(-1)">-</button>
+                        <span id="modalPortionCount" class="w-6 text-center font-bold text-slate-800 text-base">2</span>
+                        <button class="w-8 h-8 rounded text-slate-500 hover:bg-slate-100 transition font-bold text-base" onclick="updateModalPortions(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-black text-slate-800 mb-3 flex items-center"><span class="text-slate-400 mr-2" aria-hidden="true" style="font-style:normal">📝</span> Ingredients</h3>
+                    <ul id="modalIngredients" class="space-y-2 text-sm text-slate-600 font-medium"></ul>
+                </div>
+
+                <div>
+                    <h3 class="font-black text-slate-800 mb-3 flex items-center"><span class="text-slate-400 mr-2" aria-hidden="true" style="font-style:normal">🍳</span> Instructions</h3>
+                    <p id="modalInstructions" class="text-sm text-slate-600 leading-relaxed"></p>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t border-slate-100 bg-white shrink-0 safe-b">
+                <button id="modalAddBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-base">
+                    + Add to Meal Plan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Sheet Fallback -->
+    <div id="shareSheet" class="vis fixed inset-0 z-[60] hidden items-end sm:items-center justify-center">
+        <div class="absolute inset-0 bg-slate-900/50" onclick="closeShareSheet()"></div>
+        <div class="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl p-4 safe-b" style="max-height:92%;overflow-y:auto">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-lg font-black text-slate-800">Share</h3>
+                <button onclick="closeShareSheet()" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-500"><span aria-hidden="true" style="font-style:normal">✕</span></button>
+            </div>
+            <textarea id="sharePreview" readonly class="w-full h-28 p-3 text-xs border border-slate-200 rounded-xl bg-slate-50 text-slate-600 mb-3"></textarea>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="shareVia('whatsapp')" class="bg-green-500 text-white py-3 rounded-xl font-bold text-sm"><span class="mr-1" aria-hidden="true" style="font-style:normal">💬</span> WhatsApp</button>
+                <button onclick="shareVia('sms')" class="bg-blue-500 text-white py-3 rounded-xl font-bold text-sm"><span class="mr-1" aria-hidden="true" style="font-style:normal">📱</span> Messages</button>
+                <button onclick="shareVia('email')" class="bg-slate-700 text-white py-3 rounded-xl font-bold text-sm"><span class="mr-1" aria-hidden="true" style="font-style:normal">✉️</span> Email</button>
+                <button onclick="shareVia('copy')" class="bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm"><span class="mr-1" aria-hidden="true" style="font-style:normal">📋</span> Copy</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast"></div>
+
+<script>
+    const categories = ["Chicken", "Beef", "Pork & Bacon", "Fish & Seafood", "Burgers & Wraps", "Vegetarian & Other"];
+    let recipesData = [];
+
+    async function loadRecipes() {
+        try {
+            const res = await fetch('recipes.json');
+            recipesData = await res.json();
+        } catch (e) {
+            console.error('Failed to load recipes.json', e);
+            recipesData = [];
+        }
+        initApp();
+    }
+
+    let activeFilter = 'default';
+    let activeSort = 'default';
+    let mealPlan = {};
+    try { mealPlan = JSON.parse(localStorage.getItem('fitnessMealPlan') || '{}') || {}; } catch (e) { mealPlan = {}; }
+
+    const savePlan = () => { try { localStorage.setItem('fitnessMealPlan', JSON.stringify(mealPlan)); } catch (e) {} };
+    let drawerTimer = null; 
+    let currentModalRecipeId = null;
+    let localModalPortions = 2; 
+
+    const recipeGrid = document.getElementById('recipeGrid');
+    const categoryFilters = document.getElementById('categoryFilters');
+    const topBadgeCount = document.getElementById('topBadgeCount');
+    const drawerList = document.getElementById('drawerList');
+    const drawerEmpty = document.getElementById('drawerEmpty');
+
+    function initApp() {
+        renderFilters();
+        renderGrid();
+        updateTopBadge();
+        renderDrawerList();
+    }
+
+    function renderFilters() {
+        categoryFilters.innerHTML = `<button onclick="setFilter('default')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium border whitespace-nowrap bg-indigo-600 text-white border-indigo-600 shadow-sm" data-cat="default">All</button>` + 
+        categories.map(cat => 
+            `<button onclick="setFilter('${cat}')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium border border-slate-200 bg-white text-slate-600 whitespace-nowrap shadow-sm" data-cat="${cat}">${cat}</button>`
+        ).join('');
+        
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.sort-btn').forEach(b => {
+                    b.classList.remove('bg-slate-800', 'text-white');
+                    b.classList.add('bg-white', 'text-slate-600');
+                });
+                e.target.classList.add('bg-slate-800', 'text-white');
+                e.target.classList.remove('bg-white', 'text-slate-600');
+                activeSort = e.target.dataset.sort;
+                renderGrid();
+            });
+        });
+    }
+
+    function setFilter(cat) {
+        activeFilter = cat;
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            if (b.dataset.cat === cat) {
+                b.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
+                b.classList.remove('bg-white', 'text-slate-600');
+            } else {
+                b.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600');
+                b.classList.add('bg-white', 'text-slate-600');
+            }
+        });
+        renderGrid();
+    }
+
+    function renderGrid() {
+        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+        let filtered = recipesData;
+        
+        if (query) {
+            filtered = filtered.filter(r => 
+                r.title.toLowerCase().includes(query) || 
+                r.ing.some(i => i.toLowerCase().includes(query))
+            );
+        }
+
+        if (activeFilter !== 'default') {
+            filtered = filtered.filter(r => r.cat === activeFilter);
+        }
+
+        if (activeSort === 'protein') {
+            filtered = [...filtered].sort((a, b) => b.pro - a.pro);
+        } else if (activeSort === 'calories') {
+            filtered = [...filtered].sort((a, b) => a.cal - b.cal);
+        } else if (activeSort === 'time') {
+            filtered = [...filtered].sort((a, b) => a.time - b.time);
+        }
+
+        recipeGrid.innerHTML = !filtered.length ? '<p class="col-span-full text-center text-slate-400 py-12">No recipes found.</p>' : filtered.map(r => `
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden cursor-pointer hover:shadow-md transition flex flex-col p-5" onclick="openModal(${r.id})">
+                <div class="flex-1 relative">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 mb-1 block">${r.cat}</span>
+                    <h3 class="text-lg font-black text-slate-800 pr-2 leading-tight mb-3">${r.title}</h3>
+                    
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="text-[11px] font-semibold bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md">💪 ${r.pro}g Pro</span>
+                        <span class="text-[11px] font-semibold bg-orange-50 text-orange-600 px-2.5 py-1 rounded-md">🔥 ${r.cal} kcal</span>
+                        <span class="text-[11px] font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md">⏱️ ${r.time}m</span>
+                    </div>
+                </div>
+                
+                <div class="pt-4 border-t border-slate-100 bg-white flex items-center justify-between" onclick="event.stopPropagation()">
+                    <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-sm">
+                        <button class="w-6 h-6 rounded text-slate-500 hover:bg-slate-200 transition font-bold text-sm" onclick="updateCardPortions(${r.id}, -1)">-</button>
+                        <span id="card-port-${r.id}" class="w-4 text-center font-bold text-slate-800 text-sm">${cardPortions[r.id] || 2}</span>
+                        <button class="w-6 h-6 rounded text-slate-500 hover:bg-slate-200 transition font-bold text-sm" onclick="updateCardPortions(${r.id}, 1)">+</button>
+                    </div>
+                    <button id="add-btn-${r.id}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm w-[110px]" onclick="addMeal(${r.id})">
+                        + Add Meal
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    const cardPortions = {};
+    function updateCardPortions(id, delta) {
+        if (!cardPortions[id]) cardPortions[id] = 2;
+        cardPortions[id] = Math.max(1, cardPortions[id] + delta);
+        document.getElementById(`card-port-${id}`).innerText = cardPortions[id];
+    }
+
+    function addMeal(id) {
+        const qty = cardPortions[id] || 2;
+        if (!mealPlan[id]) mealPlan[id] = 0;
+        mealPlan[id] += qty;
+        
+        const btn = document.getElementById(`add-btn-${id}`);
+        const ogText = '+ Add Meal';
+        btn.innerHTML = `<span aria-hidden="true" style="font-style:normal">✓</span> Added`;
+        btn.classList.replace('bg-indigo-600', 'bg-green-500');
+        btn.classList.replace('hover:bg-indigo-700', 'hover:bg-green-600');
+        setTimeout(() => {
+            if (!btn.isConnected) return;
+            btn.innerHTML = ogText;
+            btn.classList.replace('bg-green-500', 'bg-indigo-600');
+            btn.classList.replace('hover:bg-green-600', 'hover:bg-indigo-700');
+        }, 2000);
+
+        updateTopBadge();
+        renderDrawerList();
+    }
+
+    function changePlanQty(id, d) {
+        mealPlan[id] = Math.max(1, (mealPlan[id] || 1) + d);
+        updateTopBadge();
+        renderDrawerList();
+    }
+
+    function removeMeal(id) {
+        delete mealPlan[id];
+        updateTopBadge();
+        renderDrawerList();
+    }
+
+    function openModal(id) {
+        currentModalRecipeId = id;
+        localModalPortions = 2; 
+        renderModalContent();
+        document.getElementById('recipeModal').classList.replace('modal-closed', 'modal-open');
+    }
+
+    function closeModal() {
+        document.getElementById('recipeModal').classList.replace('modal-open', 'modal-closed');
+        currentModalRecipeId = null;
+    }
+
+    function updateModalPortions(delta) {
+        localModalPortions = Math.max(1, localModalPortions + delta);
+        renderModalContent();
+    }
+
+    function scaleIngredientText(ing, multiplier) {
+        return ing.replace(/^(\d*\.?\d+)/, match => {
+            return String(Math.round(parseFloat(match) * multiplier * 100) / 100);
+        });
+    }
+
+    function renderModalContent() {
+        if(!currentModalRecipeId) return;
+        const r = recipesData.find(x => x.id === currentModalRecipeId);
+        if(!r) return;
+        
+        document.getElementById('modalCat').innerText = r.cat;
+        document.getElementById('modalTitle').innerText = r.title;
+        document.getElementById('modalPortionCount').innerText = localModalPortions;
+        
+        document.getElementById('modalBadges').innerHTML = `
+            <span class="text-xs font-semibold bg-blue-50 text-blue-600 px-3 py-1.5 rounded-md">💪 ${r.pro}g Pro</span>
+            <span class="text-xs font-semibold bg-orange-50 text-orange-600 px-3 py-1.5 rounded-md">🔥 ${r.cal} kcal</span>
+            <span class="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-md">⏱️ ${r.time}m</span>
+        `;
+        
+        const multiplier = localModalPortions;
+        document.getElementById('modalIngredients').innerHTML = r.ing.map(ing => 
+            `<li class="flex items-center"><div class="w-1.5 h-1.5 rounded-full bg-indigo-400 mr-2 shrink-0"></div> <span>${scaleIngredientText(ing, multiplier)}</span></li>`
+        ).join('');
+        
+        document.getElementById('modalInstructions').innerText = r.inst;
+        
+        const addBtn = document.getElementById('modalAddBtn');
+        addBtn.onclick = () => {
+            if (!mealPlan[r.id]) mealPlan[r.id] = 0;
+            mealPlan[r.id] += localModalPortions;
+            updateTopBadge();
+            renderDrawerList();
+            
+            const ogText = '+ Add to Meal Plan';
+            addBtn.innerHTML = `<span class="mr-2" aria-hidden="true" style="font-style:normal">✓</span> Added to Plan`;
+            addBtn.classList.replace('bg-indigo-600', 'bg-green-500');
+            addBtn.classList.replace('hover:bg-indigo-700', 'hover:bg-green-600');
+            setTimeout(() => {
+                addBtn.innerHTML = ogText;
+                addBtn.classList.replace('bg-green-500', 'bg-indigo-600');
+                addBtn.classList.replace('hover:bg-green-600', 'hover:bg-indigo-700');
+                if (currentModalRecipeId === r.id) closeModal();
+            }, 1000);
+        };
+    }
+
+    function toggleDrawer(show) {
+        const drawer = document.getElementById('drawerContent');
+        const backdrop = document.getElementById('drawerBackdrop');
+        const drawerContainer = document.getElementById('planDrawer');
+        clearTimeout(drawerTimer);
+        if (show) {
+            drawerContainer.classList.remove('pointer-events-none');
+            backdrop.classList.add('opacity-100');
+            backdrop.classList.remove('opacity-0');
+            drawer.classList.add('drawer-up');
+            drawer.classList.remove('drawer-down');
+        } else {
+            backdrop.classList.add('opacity-0');
+            backdrop.classList.remove('opacity-100');
+            drawer.classList.add('drawer-down');
+            drawer.classList.remove('drawer-up');
+            drawerTimer = setTimeout(() => {
+                drawerContainer.classList.add('pointer-events-none');
+            }, 300);
+        }
+    }
+
+    function updateTopBadge() {
+        const mealIds = Object.keys(mealPlan);
+        const totalPortions = mealIds.reduce((sum, id) => sum + mealPlan[id], 0);
+        topBadgeCount.innerText = totalPortions;
+        savePlan();
+    }
+
+    function renderDrawerList() {
+        const ids = Object.keys(mealPlan);
+        if (ids.length === 0) {
+            drawerEmpty.style.display = 'block';
+            drawerList.innerHTML = '';
+            return;
+        }
+        
+        drawerEmpty.style.display = 'none';
+        drawerList.innerHTML = ids.map(id => {
+            const r = recipesData.find(x => x.id == id);
+            if(!r) return '';
+            return `
+            <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between">
+                <div>
+                    <h4 class="font-bold text-slate-800 leading-tight">${r.title}</h4>
+                    <div class="flex items-center gap-2 mt-1">
+                        <button onclick="changePlanQty(${id}, -1)" class="w-6 h-6 rounded bg-slate-100 text-slate-600 font-bold">-</button>
+                        <span class="text-xs text-slate-500 font-medium">${mealPlan[id]} Portion${mealPlan[id] === 1 ? '' : 's'}</span>
+                        <button onclick="changePlanQty(${id}, 1)" class="w-6 h-6 rounded bg-slate-100 text-slate-600 font-bold">+</button>
+                    </div>
+                </div>
+                <button onclick="removeMeal(${id})" class="w-8 h-8 rounded-full text-red-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition">
+                    <span aria-hidden="true" style="font-style:normal">🗑️</span>
+                </button>
+            </div>`;
+        }).join('');
+    }
+
+    function getAggregatedIngredientStrings() {
+        const map = new Map();
+        Object.keys(mealPlan).forEach(id => {
+            const r = recipesData.find(x => x.id == id);
+            if(!r) return;
+            const m = mealPlan[id];
+            r.ing.forEach(ing => {
+                const mt = ing.match(/^(\d*\.?\d+)\s*(kg|ml|g|l|tsp|tbsp)?\s+(.+)$/i);
+                const key = mt ? (mt[2] || '').toLowerCase() + '|' + mt[3].trim().toLowerCase() : 'raw|' + ing.toLowerCase();
+                let e = map.get(key);
+                if (!e) { e = { mt, unit: mt ? (mt[2] || '').toLowerCase() : '', name: mt ? mt[3].trim() : ing, qty: 0, from: [] }; map.set(key, e); }
+                if (mt) e.qty += parseFloat(mt[1]) * m;
+                if (!e.from.includes(r.title)) e.from.push(r.title);
+            });
+        });
+        return [...map.values()].map(e => {
+            const q = Math.round(e.qty * 100) / 100;
+            const label = e.mt ? (/^(g|ml|kg|l)$/.test(e.unit) ? `${q}${e.unit} ${e.name}` : `${q}${e.unit ? ' ' + e.unit : ''} ${e.name}`) : e.name;
+            return `- ${label} (from ${e.from.join(', ')})`;
+        });
+    }
+
+    async function shareCurrentRecipe() {
+        if(!currentModalRecipeId) return;
+        const r = recipesData.find(x => x.id === currentModalRecipeId);
+        if(!r) return;
+        const multiplier = localModalPortions;
+        
+        let text = `🍽️ ${r.title.toUpperCase()}\n`;
+        text += `Macros (Per Portion): ${r.pro}g Pro | ${r.cal} kcal\n\n`;
+        text += `🛒 INGREDIENTS (Scaled for ${localModalPortions}):\n`;
+        r.ing.forEach(ing => {
+            text += `• ${scaleIngredientText(ing, multiplier)}\n`;
+        });
+        text += `\n👨‍🍳 INSTRUCTIONS:\n${r.inst}\n`;
+        
+        await executeNativeShare(`Recipe: ${r.title}`, text);
+    }
+
+    async function sharePlan() {
+        const ids = Object.keys(mealPlan);
+        if(ids.length === 0) return showToast('Plan is empty!');
+        
+        let text = "🍽️ MY FITNESS MEAL PLAN\n\n";
+        ids.forEach(id => {
+            const r = recipesData.find(x => x.id == id);
+            if(r) text += `• ${r.title} (${mealPlan[id]} portions)\n`;
+        });
+        text += "\n🛒 INGREDIENTS:\n";
+        text += getAggregatedIngredientStrings().join('\n');
+        
+        await executeNativeShare("My Weekly Meal Plan", text);
+    }
+
+    let shareData = { title: '', text: '' };
+    async function executeNativeShare(title, text) {
+        shareData = { title, text };
+        if (navigator.share) {
+            try {
+                if (!navigator.canShare || navigator.canShare({ title, text })) {
+                    await navigator.share({ title, text });
+                    return;
+                }
+            } catch (err) {
+                if (err && err.name === 'AbortError') return;
+            }
+        }
+        openShareSheet();
+    }
+
+    function openShareSheet() {
+        document.getElementById('sharePreview').value = shareData.text;
+        const el = document.getElementById('shareSheet');
+        el.classList.remove('hidden'); el.classList.add('flex');
+    }
+    
+    function closeShareSheet() {
+        const el = document.getElementById('shareSheet');
+        el.classList.add('hidden'); el.classList.remove('flex');
+    }
+    
+    function shareVia(kind) {
+        const t = encodeURIComponent(shareData.text), sub = encodeURIComponent(shareData.title);
+        if (kind === 'copy') return copyText(shareData.text, 'Copied to clipboard!');
+        const urls = { whatsapp: 'https://wa.me/?text=' + t, sms: 'sms:?&body=' + t, email: 'mailto:?subject=' + sub + '&body=' + t };
+        const w = window.open(urls[kind], '_blank', 'noopener');
+        if (!w) copyText(shareData.text, 'Couldn\'t open the app - copied instead');
+    }
+
+    function generateAIPrompt() {
+        const ids = Object.keys(mealPlan);
+        if(ids.length === 0) return showToast('Plan is empty! Add meals first.');
+        
+        const prompt = `You are an expert UK supermarket grocery planner and budget optimization assistant. I am providing you with an aggregated list of ingredients for my weekly meal plan.
+
+Please perform the following tasks:
+1. SUPERMARKET RECOMMENDATION: Analyze the specialty items in my list (e.g., Lo Dough bases, specific seasonings, specialized cheeses like Eat Lean, exotic curry pastes, etc.). Recommend whether I should do a main shop at a budget supermarket (Aldi/Lidl/Asda) and a secondary trip to a specialty retailer (Tesco, Sainsbury's, or M&S) for specific items, or if one specific supermarket covers everything best.
+2. CONSOLIDATION & PACK SIZES: Consolidate overlapping ingredients and suggest the most economical UK retail pack sizes to minimize food and packaging waste.
+3. AISLE ORGANIZATION: Group the final shopping list strictly by supermarket aisle (Produce, Meat & Poultry, Dairy & Refrigerated, Bakery, Pantry & Spices, Frozen).
+4. SMART TIPS: Add helpful UK shopping tips regarding own-brand alternatives or bulk buying.
+
+Here is my aggregated ingredient list:
+${getAggregatedIngredientStrings().join('\n')}
+
+Please output the structured supermarket guide and final optimized shopping list.`;
+
+        copyText(prompt, 'AI prompt copied!', () => {
+            shareData = { title: 'Supermarket AI Prompt', text: prompt };
+            openShareSheet();
+        });
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function legacyCopy(text) {
+        try {
+            const ta = document.createElement('textarea');
+            ta.value = text; ta.setAttribute('readonly', '');
+            ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+            document.body.appendChild(ta);
+            ta.select(); ta.setSelectionRange(0, text.length);
+            const ok = document.execCommand('copy');
+            document.body.removeChild(ta);
+            return ok;
+        } catch (e) { return false; }
+    }
+
+    async function copyText(text, msg, onFail) {
+        let ok = false;
+        try {
+            if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); ok = true; }
+        } catch (e) {}
+        if (!ok) ok = legacyCopy(text);
+        if (ok) showToast(msg || 'Copied!');
+        else if (onFail) onFail();
+        else showToast('Copy failed');
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        closeShareSheet(); closeModal(); toggleDrawer(false);
+    });
+
+    (function () {
+        const root = document.documentElement;
+        const probe = document.createElement('div');
+        probe.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:100%;opacity:0;pointer-events:none';
+        document.body.appendChild(probe);
+        if (!('IntersectionObserver' in window)) return;
+        const th = []; for (let i = 0; i <= 100; i++) th.push(i / 100);
+        new IntersectionObserver(entries => {
+            const e = entries[entries.length - 1], r = e.intersectionRect;
+            if (e.isIntersecting && r.height > 150) {
+                root.style.setProperty('--vt', Math.max(0, r.top) + 'px');
+                root.style.setProperty('--vh', r.height + 'px');
+            }
+        }, { threshold: th }).observe(probe);
+    })();
+
+    loadRecipes();
+</script>
+</body>
+</html>
