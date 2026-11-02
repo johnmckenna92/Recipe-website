@@ -552,6 +552,7 @@
         const prompt = `You are an expert UK supermarket grocery planner and budget optimization assistant. I am providing you with an aggregated list of ingredients for my weekly meal plan.
 
 Please perform the following tasks:
+0. ESTIMATED PRICE ANALYSIS: Conduct a quick mental search/check of current online UK supermarket prices for the items on the list (factoring in budget baseline stores like Aldi/Lidl alongside mid-tier stores like Tesco/Sainsbury's). Provide an estimated total basket price and a brief breakdown of key cost-driving items before jumping into store recommendations.
 1. SUPERMARKET RECOMMENDATION: Analyze the specialty items in my list (e.g., Lo Dough bases, specific seasonings, specialized cheeses like Eat Lean, exotic curry pastes, etc.). Recommend whether I should do a main shop at a budget supermarket (Aldi/Lidl/Asda) and a secondary trip to a specialty retailer (Tesco, Sainsbury's, or M&S) for specific items, or if one specific supermarket covers everything best.
 2. CONSOLIDATION & PACK SIZES: Consolidate overlapping ingredients and suggest the most economical UK retail pack sizes to minimize food and packaging waste.
 3. AISLE ORGANIZATION: Group the final shopping list strictly by supermarket aisle (Produce, Meat & Poultry, Dairy & Refrigerated, Bakery, Pantry & Spices, Frozen).
@@ -560,7 +561,7 @@ Please perform the following tasks:
 Here is my aggregated ingredient list:
 ${getAggregatedIngredientStrings().join('\n')}
 
-Please output the structured supermarket guide and final optimized shopping list.`;
+Please output the structured estimated pricing, supermarket guide, and final optimized shopping list.`;
 
         copyText(prompt, 'AI prompt copied!', () => {
             shareData = { title: 'Supermarket AI Prompt', text: prompt };
