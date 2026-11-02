@@ -552,11 +552,11 @@
         const prompt = `You are an expert UK supermarket grocery planner and budget optimization assistant. I am providing you with an aggregated list of ingredients for my weekly meal plan.
 
 Please perform the following tasks:
-0. ESTIMATED PRICE ANALYSIS: Conduct a quick mental search/check of current online UK supermarket prices for the items on the list (factoring in budget baseline stores like Aldi/Lidl alongside mid-tier stores like Tesco/Sainsbury's). Provide an estimated total basket price and a brief breakdown of key cost-driving items before jumping into store recommendations.
-1. SUPERMARKET RECOMMENDATION: Analyze the specialty items in my list (e.g., Lo Dough bases, specific seasonings, specialized cheeses like Eat Lean, exotic curry pastes, etc.). Recommend whether I should do a main shop at a budget supermarket (Aldi/Lidl/Asda) and a secondary trip to a specialty retailer (Tesco, Sainsbury's, or M&S) for specific items, or if one specific supermarket covers everything best.
+0. ESTIMATED PRICE ANALYSIS: Conduct a quick mental check of current online UK supermarket prices for the items on the list (factoring in budget baseline stores like Aldi/Lidl alongside mid-tier stores like Tesco/Sainsbury's). Provide an estimated total basket price and a brief breakdown of key cost-driving items.
+1. SUPERMARKET RECOMMENDATION: Analyze the specialty items in my list (e.g., Lo Dough bases, specific seasonings, specialized cheeses like Eat Lean, exotic curry pastes, etc.). Recommend whether I should do a main shop at a budget supermarket (Aldi/Lidl/Asda) and a secondary trip to a specialty retailer (Tesco, Sainsbury's, or M&S) for specific items, or if one specific supermarket covers everything best. Include specific stock availability notes where items are known to be exclusive to certain chains.
 2. CONSOLIDATION & PACK SIZES: Consolidate overlapping ingredients and suggest the most economical UK retail pack sizes to minimize food and packaging waste.
-3. AISLE ORGANIZATION: Group the final shopping list strictly by supermarket aisle (Produce, Meat & Poultry, Dairy & Refrigerated, Bakery, Pantry & Spices, Frozen).
-4. SMART TIPS: Add helpful UK shopping tips regarding own-brand alternatives or bulk buying.
+3. AISLE ORGANIZATION & CONDITIONAL SECTIONS: Group the final shopping list by supermarket aisle (Produce, Meat & Poultry, Dairy & Refrigerated, Bakery, Pantry & Spices, Frozen). **Omit any aisle section entirely if there are zero items assigned to it.** For specialty items, include a quick budget-friendly or readily available supermarket substitution option in brackets.
+4. SMART TIPS: Add helpful UK shopping tips regarding own-brand alternatives, loyalty app savings (e.g., Tesco Clubcard / Sainsbury's Nectar prices), or bulk buying.
 
 Here is my aggregated ingredient list:
 ${getAggregatedIngredientStrings().join('\n')}
