@@ -1,18 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Fitness | Meal Planner & Grocery AI</title>
+    <title>Fitness Booklet | Meal Planner & Grocery AI</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Marked.js CDN for AI Output Parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
         .vis { top: var(--vt, 0px) !important; bottom: auto !important; height: var(--vh, 100dvh) !important; }
         .drawer-h { height: 85%; }
         .modal-h { max-height: 92%; }
         .safe-b { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)); }
-        #toast { position: fixed; left: 50%; top: calc(var(--vt, 0px) + var(--vh, 100dvh) - 150px); transform: translateX(-50%) translateY(10px); background: #334155; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: all .25s; z-index: 100; max-width: 90%; text-align: center; }
+        #toast { 
+            position: fixed; 
+            left: 50%; 
+            top: calc(var(--vt, 0px) + var(--vh, 100dvh) - 150px); 
+            transform: translateX(-50%) translateY(10px); 
+            background: #0f172a; 
+            color: #fff; 
+            padding: 12px 22px; 
+            border-radius: 9999px; 
+            font-size: 14px; 
+            font-weight: 700; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: all .25s cubic-bezier(0.16, 1, 0.3, 1); 
+            z-index: 100; 
+            max-width: 90%; 
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
         #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -20,84 +47,37 @@
         .drawer-down { transform: translateY(100%); }
         .modal-open { opacity: 1; pointer-events: auto; transform: scale(1); }
         .modal-closed { opacity: 0; pointer-events: none; transform: scale(0.95); }
-
-        /* Custom AI Content Formatting Styles */
-        #aiContent h3 {
-            background-color: rgba(238, 242, 255, 0.6);
-            border-left: 4px solid #4f46e5;
-            border-radius: 0.75rem;
-            padding: 0.875rem 1rem;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
-            font-weight: 900;
-            color: #0f172a;
-            font-size: 1rem;
-            line-height: 1.4;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        }
-        #aiContent hr {
-            border: 0;
-            border-top: 1px dashed #e2e8f0;
-            margin: 1.5rem 0;
-        }
-        .ai-check-card {
-            background-color: #ffffff;
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            border-radius: 0.75rem;
-            padding: 0.875rem 1rem;
-            margin-bottom: 0.5rem;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            user-select: none;
-        }
-        .ai-check-card:hover {
-            border-color: #c7d2fe;
-        }
-        .ai-check-card.completed {
-            background-color: #f8fafc;
-            border-color: #e2e8f0;
-            opacity: 0.65;
-        }
-        .ai-check-card.completed span {
-            text-decoration: line-through;
-            color: #94a3b8;
-            opacity: 0.6;
-        }
-        .ai-check-card input[type="checkbox"] {
-            min-width: 20px;
-            min-height: 20px;
-            width: 20px;
-            height: 20px;
-            accent-color: #4f46e5;
-            cursor: pointer;
-            border-radius: 0.25rem;
-        }
+        
+        .shadow-2xs { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03); }
+        .shadow-xs { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05); }
     </style>
 </head>
-<body class="text-slate-800 pb-16">
+<body class="text-slate-800 pb-16 antialiased selection:bg-indigo-500 selection:text-white">
 
     <!-- Header & Top Plan Button -->
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-black text-slate-900 tracking-tight">Fitness Meals</h1>
-                <p class="text-xs text-slate-500">Select recipes & generate AI lists</p>
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-40 shadow-2xs">
+        <div class="max-w-4xl mx-auto px-4 py-3.5 flex justify-between items-center gap-4">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-black text-lg shadow-sm shadow-indigo-500/30">
+                    💪
+                </div>
+                <div>
+                    <h1 class="text-xl font-black text-slate-900 tracking-tight leading-none">Fitness Meals</h1>
+                    <p class="text-[11px] font-semibold text-slate-400 mt-0.5">Select recipes & generate AI lists</p>
+                </div>
             </div>
-            <button onclick="toggleDrawer(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm flex items-center gap-2">
-                <span aria-hidden="true" style="font-style:normal">🧺</span>
-                <span id="topBadgeCount" class="bg-indigo-800 text-xs px-2 py-0.5 rounded-full">0</span>
+            <button onclick="toggleDrawer(true)" class="relative bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-150 shadow-sm shadow-indigo-500/20 flex items-center gap-2.5 group">
+                <span aria-hidden="true" style="font-style:normal" class="text-base group-hover:scale-110 transition-transform">🧺</span>
+                <span class="font-bold">Plan</span>
+                <span id="topBadgeCount" class="bg-indigo-900/80 text-white text-xs px-2 py-0.5 rounded-full font-black min-w-[20px] text-center transition-transform duration-150">0</span>
             </button>
         </div>
-        <div class="max-w-4xl mx-auto px-4 pb-3">
+        <div class="max-w-4xl mx-auto px-4 pb-3.5">
             <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span class="text-slate-400" aria-hidden="true" style="font-style:normal">🔍</span>
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <span class="text-slate-400 text-sm" aria-hidden="true" style="font-style:normal">🔍</span>
                 </div>
-                <input type="text" id="searchInput" oninput="renderGrid()" placeholder="Search recipes or ingredients..." class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm transition">
+                <input type="text" id="searchInput" oninput="renderGrid()" placeholder="Search recipes or ingredients..." class="block w-full pl-10 pr-4 py-2.5 border border-slate-200/80 rounded-2xl leading-5 bg-slate-50/80 placeholder-slate-400 text-slate-800 font-medium focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 sm:text-sm transition-all duration-200 shadow-2xs">
             </div>
         </div>
     </header>
@@ -107,49 +87,56 @@
         <!-- Filters & Sorting -->
         <div class="mb-6 space-y-4">
             <div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Filter by Category</h3>
-                <div class="flex overflow-x-auto gap-2 pb-2 hide-scrollbar" id="categoryFilters"></div>
+                <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-2.5 px-0.5">Filter by Category</h3>
+                <div class="flex overflow-x-auto gap-2 pb-2 hide-scrollbar scroll-smooth" id="categoryFilters"></div>
             </div>
             <div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Sort by</h3>
-                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1" id="sortFilters">
-                    <button class="sort-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border border-slate-200 bg-slate-800 text-white" data-sort="default">All</button>
-                    <button class="sort-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border border-slate-200 bg-white text-slate-600" data-sort="protein">Highest Protein</button>
-                    <button class="sort-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border border-slate-200 bg-white text-slate-600" data-sort="calories">Lowest Calories</button>
-                    <button class="sort-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border border-slate-200 bg-white text-slate-600" data-sort="time">Quickest to Make</button>
+                <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-2.5 px-0.5">Sort by</h3>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1 scroll-smooth" id="sortFilters">
+                    <button class="sort-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all duration-150 border border-slate-900 bg-slate-900 text-white shadow-xs" data-sort="default">All</button>
+                    <button class="sort-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all duration-150 border border-slate-200/80 bg-slate-100 text-slate-600 hover:bg-slate-200/80" data-sort="protein">Highest Protein</button>
+                    <button class="sort-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all duration-150 border border-slate-200/80 bg-slate-100 text-slate-600 hover:bg-slate-200/80" data-sort="calories">Lowest Calories</button>
+                    <button class="sort-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all duration-150 border border-slate-200/80 bg-slate-100 text-slate-600 hover:bg-slate-200/80" data-sort="time">Quickest to Make</button>
                 </div>
             </div>
         </div>
 
         <!-- Recipe Grid -->
-        <div id="recipeGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div id="recipeGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 
     </main>
 
     <!-- Meal Plan Drawer -->
     <div id="planDrawer" class="vis fixed inset-0 z-50 pointer-events-none">
-        <div class="absolute inset-0 bg-slate-900/40 opacity-0 transition-opacity duration-300" id="drawerBackdrop" onclick="toggleDrawer(false)"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-xl drawer-h flex flex-col drawer-down transition-transform duration-300 ease-out pointer-events-auto" id="drawerContent">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-xs opacity-0 transition-opacity duration-300" id="drawerBackdrop" onclick="toggleDrawer(false)"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl drawer-h flex flex-col drawer-down transition-transform duration-300 ease-out pointer-events-auto border-t border-slate-200/60 max-w-2xl mx-auto" id="drawerContent">
             
-            <div class="px-4 py-4 border-b border-slate-100 flex justify-between items-center shrink-0">
-                <h2 class="text-xl font-black text-slate-800">Your Meal Plan</h2>
-                <button onclick="toggleDrawer(false)" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200"><span aria-hidden="true" style="font-style:normal">✕</span></button>
+            <!-- Handle bar -->
+            <div class="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mt-3 shrink-0"></div>
+
+            <div class="px-5 py-3 border-b border-slate-100 flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🧺</span>
+                    <h2 class="text-xl font-black text-slate-900 tracking-tight">Your Meal Plan</h2>
+                </div>
+                <button onclick="toggleDrawer(false)" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition active:scale-95"><span aria-hidden="true" style="font-style:normal">✕</span></button>
             </div>
             
-            <div class="flex-1 overflow-y-auto p-4 bg-slate-50">
-                <div id="drawerEmpty" class="text-center text-slate-500 py-10">
-                    <span class="text-4xl text-slate-300 mb-3 block" aria-hidden="true" style="font-style:normal">🧺</span>
-                    <p>No meals selected yet.</p>
+            <div class="flex-1 overflow-y-auto p-4 bg-slate-50/50">
+                <div id="drawerEmpty" class="text-center text-slate-500 py-16 px-4 flex flex-col items-center justify-center">
+                    <div class="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-3xl mb-3 shadow-2xs">🧺</div>
+                    <h3 class="font-black text-slate-900 text-lg mb-1">Your Plan is Empty</h3>
+                    <p class="text-xs text-slate-500 max-w-xs leading-relaxed font-medium">Browse recipes from the main menu and tap "+ Add Meal" to build your custom grocery list and AI supermarket breakdown.</p>
                 </div>
                 <div id="drawerList" class="space-y-3"></div>
             </div>
 
-            <div class="p-4 bg-white border-t border-slate-100 shrink-0 space-y-3 safe-b">
-                <button onclick="sharePlan()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-base">
-                    <span class="mr-2" aria-hidden="true" style="font-style:normal">📤</span> Share Plan & Grocery List
+            <div class="p-4 bg-white border-t border-slate-100 shrink-0 space-y-2.5 safe-b">
+                <button onclick="sharePlan()" class="w-full bg-slate-900 hover:bg-black active:scale-[0.99] text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-sm gap-2">
+                    <span aria-hidden="true" style="font-style:normal">📤</span> Share Plan & Grocery List
                 </button>
-                <button onclick="generateAIPrompt()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-base">
-                    <span class="mr-2" aria-hidden="true" style="font-style:normal">🤖</span> Generate Supermarket AI Optimizer Output
+                <button onclick="generateAIPrompt()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-md shadow-indigo-500/20 text-sm gap-2">
+                    <span aria-hidden="true" style="font-style:normal">🤖</span> Generate Supermarket AI Optimizer Output
                 </button>
             </div>
         </div>
@@ -157,51 +144,51 @@
 
     <!-- Recipe Modal -->
     <div id="recipeModal" class="vis fixed inset-0 z-50 flex items-center justify-center p-4 modal-closed transition-all duration-200">
-        <div class="absolute inset-0 bg-slate-900/40 rounded-xl" onclick="closeModal()"></div>
-        <div class="bg-white rounded-2xl w-full max-w-lg modal-h flex flex-col relative z-10 shadow-2xl overflow-hidden">
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-xs" onclick="closeModal()"></div>
+        <div class="bg-white rounded-3xl w-full max-w-lg modal-h flex flex-col relative z-10 shadow-2xl overflow-hidden border border-slate-100">
             
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
-                <span id="modalCat" class="text-xs font-bold uppercase tracking-wider text-indigo-600"></span>
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/80 shrink-0">
+                <span id="modalCat" class="text-xs font-black uppercase tracking-wider text-indigo-600"></span>
                 <div class="flex gap-2">
-                    <button onclick="shareCurrentRecipe()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-indigo-600 hover:bg-slate-100 shadow-sm transition text-sm" title="Share Recipe">
+                    <button onclick="shareCurrentRecipe()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200/80 rounded-full text-indigo-600 hover:bg-indigo-50 shadow-2xs transition active:scale-95 text-sm" title="Share Recipe">
                         <span aria-hidden="true" style="font-style:normal">📤</span>
                     </button>
-                    <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-100 shadow-sm transition text-sm">
+                    <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200/80 rounded-full text-slate-500 hover:bg-slate-100 shadow-2xs transition active:scale-95 text-sm">
                         <span aria-hidden="true" style="font-style:normal">✕</span>
                     </button>
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto px-5 py-4">
-                <h2 id="modalTitle" class="text-2xl font-black text-slate-800 leading-tight mb-3"></h2>
+            <div class="flex-1 overflow-y-auto px-6 py-5">
+                <h2 id="modalTitle" class="text-2xl font-black text-slate-900 leading-tight mb-3"></h2>
                 
                 <div class="flex flex-wrap gap-2 mb-6" id="modalBadges"></div>
                 
-                <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-between items-center">
+                <div class="mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-200/60 flex justify-between items-center shadow-2xs">
                     <div>
-                        <span class="font-bold text-slate-700 block">Scale Ingredients</span>
-                        <span class="text-xs text-slate-400">Cooking for more? Adjust here.</span>
+                        <span class="font-extrabold text-slate-900 text-sm block">Scale Ingredients</span>
+                        <span class="text-xs text-slate-400 font-medium">Adjust portions to scale quantities</span>
                     </div>
-                    <div class="flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 shadow-sm">
-                        <button class="w-8 h-8 rounded text-slate-500 hover:bg-slate-100 transition font-bold text-base" onclick="updateModalPortions(-1)">-</button>
-                        <span id="modalPortionCount" class="w-6 text-center font-bold text-slate-800 text-base">2</span>
-                        <button class="w-8 h-8 rounded text-slate-500 hover:bg-slate-100 transition font-bold text-base" onclick="updateModalPortions(1)">+</button>
+                    <div class="flex items-center gap-3 bg-white border border-slate-200/80 rounded-xl px-2.5 py-1.5 shadow-2xs">
+                        <button class="w-8 h-8 rounded-lg text-slate-700 hover:bg-slate-100 transition font-bold text-base flex items-center justify-center active:scale-95" onclick="updateModalPortions(-1)">-</button>
+                        <span id="modalPortionCount" class="w-6 text-center font-black text-slate-900 text-base">2</span>
+                        <button class="w-8 h-8 rounded-lg text-slate-700 hover:bg-slate-100 transition font-bold text-base flex items-center justify-center active:scale-95" onclick="updateModalPortions(1)">+</button>
                     </div>
                 </div>
 
                 <div class="mb-6">
-                    <h3 class="font-black text-slate-800 mb-3 flex items-center"><span class="text-slate-400 mr-2" aria-hidden="true" style="font-style:normal">📝</span> Ingredients</h3>
-                    <ul id="modalIngredients" class="space-y-2 text-sm text-slate-600 font-medium"></ul>
+                    <h3 class="font-black text-slate-900 mb-3 flex items-center text-base"><span class="text-slate-400 mr-2 text-base" aria-hidden="true" style="font-style:normal">📝</span> Ingredients</h3>
+                    <ul id="modalIngredients" class="space-y-2 text-sm text-slate-700 font-medium"></ul>
                 </div>
 
                 <div>
-                    <h3 class="font-black text-slate-800 mb-3 flex items-center"><span class="text-slate-400 mr-2" aria-hidden="true" style="font-style:normal">🍳</span> Instructions</h3>
-                    <p id="modalInstructions" class="text-sm text-slate-600 leading-relaxed"></p>
+                    <h3 class="font-black text-slate-900 mb-3 flex items-center text-base"><span class="text-slate-400 mr-2 text-base" aria-hidden="true" style="font-style:normal">🍳</span> Instructions</h3>
+                    <p id="modalInstructions" class="text-sm text-slate-600 leading-relaxed font-medium bg-slate-50/50 border border-slate-200/60 p-4 rounded-2xl"></p>
                 </div>
             </div>
             
             <div class="p-4 border-t border-slate-100 bg-white shrink-0 safe-b">
-                <button id="modalAddBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-base">
+                <button id="modalAddBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-md shadow-indigo-500/20 text-base gap-2">
                     + Add to Meal Plan
                 </button>
             </div>
@@ -210,32 +197,32 @@
 
     <!-- AI Response Modal -->
     <div id="aiModal" class="vis fixed inset-0 z-50 flex items-center justify-center p-4 modal-closed transition-all duration-200">
-        <div class="absolute inset-0 bg-slate-900/40 rounded-xl" onclick="closeAIModal()"></div>
-        <div class="bg-white rounded-2xl w-full max-w-xl modal-h flex flex-col relative z-10 shadow-2xl overflow-hidden">
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
-                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                    <span>🤖</span> Supermarket AI Optimization
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-xs" onclick="closeAIModal()"></div>
+        <div class="bg-white rounded-3xl w-full max-w-xl modal-h flex flex-col relative z-10 shadow-2xl overflow-hidden border border-slate-100">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/80 shrink-0">
+                <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                    <span class="text-lg">🤖</span> Supermarket AI Optimization
                 </h3>
                 <div class="flex gap-2">
-                    <button onclick="shareAIResponse()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-indigo-600 hover:bg-slate-100 shadow-sm transition text-sm" title="Share AI Response">
+                    <button onclick="shareAIResponse()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200/80 rounded-full text-indigo-600 hover:bg-indigo-50 shadow-2xs transition active:scale-95 text-sm" title="Share AI Response">
                         <span aria-hidden="true" style="font-style:normal">📤</span>
                     </button>
-                    <button onclick="closeAIModal()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-100 shadow-sm transition text-sm">
+                    <button onclick="closeAIModal()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200/80 rounded-full text-slate-500 hover:bg-slate-100 shadow-2xs transition active:scale-95 text-sm">
                         <span aria-hidden="true" style="font-style:normal">✕</span>
                     </button>
                 </div>
             </div>
             <div class="flex-1 overflow-y-auto p-5">
-                <div id="aiLoader" class="text-center py-12">
-                    <div class="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-3"></div>
-                    <p class="text-sm font-bold text-slate-600">Consulting AI Supermarket Optimizer...</p>
-                    <p class="text-xs text-slate-400 mt-1">Analyzing prices, aisle breakdowns, and pack sizes.</p>
+                <div id="aiLoader" class="text-center py-16">
+                    <div class="inline-block w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4 shadow-2xs"></div>
+                    <p class="text-base font-extrabold text-slate-800">Consulting AI Supermarket Optimizer...</p>
+                    <p class="text-xs font-semibold text-slate-400 mt-1">Analyzing prices, aisle breakdowns, and pack sizes.</p>
                 </div>
-                <div id="aiContent" class="text-sm text-slate-700 leading-relaxed hidden transition-opacity duration-300 opacity-0"></div>
+                <div id="aiContent" class="text-sm text-slate-700 leading-relaxed hidden transition-opacity duration-300 opacity-100"></div>
             </div>
             <div class="p-4 border-t border-slate-100 bg-white shrink-0 safe-b flex gap-2">
-                <button onclick="shareAIResponse()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-base">
-                    <span class="mr-2" aria-hidden="true" style="font-style:normal">📤</span> Share AI Output
+                <button onclick="shareAIResponse()" class="w-full bg-slate-900 hover:bg-black active:scale-[0.99] text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-base gap-2">
+                    <span aria-hidden="true" style="font-style:normal">📤</span> Share AI Output
                 </button>
             </div>
         </div>
@@ -243,18 +230,21 @@
 
     <!-- Share Sheet Fallback -->
     <div id="shareSheet" class="vis fixed inset-0 z-[60] hidden items-end sm:items-center justify-center">
-        <div class="absolute inset-0 bg-slate-900/50" onclick="closeShareSheet()"></div>
-        <div class="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl p-4 safe-b" style="max-height:92%;overflow-y-auto">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="text-lg font-black text-slate-800">Share</h3>
-                <button onclick="closeShareSheet()" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-500"><span aria-hidden="true" style="font-style:normal">✕</span></button>
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-xs" onclick="closeShareSheet()"></div>
+        <div class="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl p-5 safe-b border border-slate-100" style="max-height:92%;overflow-y:auto">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📤</span>
+                    <h3 class="text-lg font-black text-slate-900">Share Content</h3>
+                </div>
+                <button onclick="closeShareSheet()" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 transition active:scale-95"><span aria-hidden="true" style="font-style:normal">✕</span></button>
             </div>
-            <textarea id="sharePreview" readonly class="w-full h-28 p-3 text-xs border border-slate-200 rounded-xl bg-slate-50 text-slate-600 mb-3"></textarea>
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="shareVia('whatsapp')" class="bg-green-500 text-white py-3 rounded-xl font-bold text-sm"><span class="mr-1" aria-hidden="true" style="font-style:normal">💬</span> WhatsApp</button>
-                <button onclick="shareVia('sms')" class="bg-blue-500 text-white py-3 rounded-xl font-bold text-sm"><span class="mr-1" aria-hidden="true" style="font-style:normal">📱</span> Messages</button>
-                <button onclick="shareVia('email')" class="bg-slate-700 text-white py-3 rounded-xl font-bold text-sm"><span class="mr-1" aria-hidden="true" style="font-style:normal">✉️</span> Email</button>
-                <button onclick="shareVia('copy')" class="bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm"><span class="mr-1" aria-hidden="true" style="font-style:normal">📋</span> Copy</button>
+            <textarea id="sharePreview" readonly class="w-full h-32 p-3.5 text-xs font-mono border border-slate-200/80 rounded-2xl bg-slate-50 text-slate-700 mb-4 focus:outline-none resize-none"></textarea>
+            <div class="grid grid-cols-2 gap-2.5">
+                <button onclick="shareVia('whatsapp')" class="bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white py-3 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 shadow-sm"><span aria-hidden="true" style="font-style:normal">💬</span> WhatsApp</button>
+                <button onclick="shareVia('sms')" class="bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white py-3 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 shadow-sm"><span aria-hidden="true" style="font-style:normal">📱</span> Messages</button>
+                <button onclick="shareVia('email')" class="bg-slate-800 hover:bg-slate-900 active:scale-[0.98] text-white py-3 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 shadow-sm"><span aria-hidden="true" style="font-style:normal">✉️</span> Email</button>
+                <button onclick="shareVia('copy')" class="bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white py-3 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 shadow-sm"><span aria-hidden="true" style="font-style:normal">📋</span> Copy Text</button>
             </div>
         </div>
     </div>
@@ -300,19 +290,19 @@
     }
 
     function renderFilters() {
-        categoryFilters.innerHTML = `<button onclick="setFilter('default')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium border whitespace-nowrap bg-indigo-600 text-white border-indigo-600 shadow-sm" data-cat="default">All</button>` + 
+        categoryFilters.innerHTML = `<button onclick="setFilter('default')" class="filter-btn px-4 py-2 rounded-full text-xs font-bold transition-all duration-150 border whitespace-nowrap bg-indigo-600 text-white border-transparent shadow-xs shadow-indigo-500/20" data-cat="default">All</button>` + 
         categories.map(cat => 
-            `<button onclick="setFilter('${cat}')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium border border-slate-200 bg-white text-slate-600 whitespace-nowrap shadow-sm" data-cat="${cat}">${cat}</button>`
+            `<button onclick="setFilter('${cat}')" class="filter-btn px-4 py-2 rounded-full text-xs font-bold border border-slate-200/80 bg-slate-100 text-slate-600 hover:bg-slate-200/80 whitespace-nowrap transition-all duration-150" data-cat="${cat}">${cat}</button>`
         ).join('');
         
         document.querySelectorAll('.sort-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.sort-btn').forEach(b => {
-                    b.classList.remove('bg-slate-800', 'text-white');
-                    b.classList.add('bg-white', 'text-slate-600');
+                    b.classList.remove('bg-slate-900', 'text-white', 'border-slate-900', 'shadow-xs');
+                    b.classList.add('bg-slate-100', 'text-slate-600', 'border-slate-200/80');
                 });
-                e.target.classList.add('bg-slate-800', 'text-white');
-                e.target.classList.remove('bg-white', 'text-slate-600');
+                e.target.classList.add('bg-slate-900', 'text-white', 'border-slate-900', 'shadow-xs');
+                e.target.classList.remove('bg-slate-100', 'text-slate-600', 'border-slate-200/80');
                 activeSort = e.target.dataset.sort;
                 renderGrid();
             });
@@ -323,11 +313,11 @@
         activeFilter = cat;
         document.querySelectorAll('.filter-btn').forEach(b => {
             if (b.dataset.cat === cat) {
-                b.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
-                b.classList.remove('bg-white', 'text-slate-600');
+                b.classList.add('bg-indigo-600', 'text-white', 'border-transparent', 'shadow-xs', 'shadow-indigo-500/20');
+                b.classList.remove('bg-slate-100', 'text-slate-600', 'border-slate-200/80');
             } else {
-                b.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600');
-                b.classList.add('bg-white', 'text-slate-600');
+                b.classList.remove('bg-indigo-600', 'text-white', 'border-transparent', 'shadow-xs', 'shadow-indigo-500/20');
+                b.classList.add('bg-slate-100', 'text-slate-600', 'border-slate-200/80');
             }
         });
         renderGrid();
@@ -356,26 +346,26 @@
             filtered = [...filtered].sort((a, b) => a.time - b.time);
         }
 
-        recipeGrid.innerHTML = !filtered.length ? '<p class="col-span-full text-center text-slate-400 py-12">No recipes found.</p>' : filtered.map(r => `
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden cursor-pointer hover:shadow-md transition flex flex-col p-5" onclick="openModal(${r.id})">
+        recipeGrid.innerHTML = !filtered.length ? '<p class="col-span-full text-center text-slate-400 font-bold py-16">No recipes found matching your criteria.</p>' : filtered.map(r => `
+            <div class="bg-white rounded-2xl shadow-xs hover:shadow-md border border-slate-200/80 overflow-hidden cursor-pointer transition-all duration-200 flex flex-col p-5 hover:-translate-y-0.5 group" onclick="openModal(${r.id})">
                 <div class="flex-1 relative">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 mb-1 block">${r.cat}</span>
-                    <h3 class="text-lg font-black text-slate-800 pr-2 leading-tight mb-3">${r.title}</h3>
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 mb-1 block">${r.cat}</span>
+                    <h3 class="text-lg font-black text-slate-900 pr-2 leading-snug mb-3 group-hover:text-indigo-600 transition-colors">${r.title}</h3>
                     
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="text-[11px] font-semibold bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md">💪 ${r.pro}g Pro</span>
-                        <span class="text-[11px] font-semibold bg-orange-50 text-orange-600 px-2.5 py-1 rounded-md">🔥 ${r.cal} kcal</span>
-                        <span class="text-[11px] font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md">⏱️ ${r.time}m</span>
+                        <span class="text-[11px] font-extrabold bg-blue-50 text-blue-700 border border-blue-100/80 px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-2xs">💪 ${r.pro}g Pro</span>
+                        <span class="text-[11px] font-extrabold bg-amber-50 text-amber-700 border border-amber-100/80 px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-2xs">🔥 ${r.cal} kcal</span>
+                        <span class="text-[11px] font-extrabold bg-slate-100 text-slate-700 border border-slate-200/60 px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-2xs">⏱️ ${r.time}m</span>
                     </div>
                 </div>
                 
-                <div class="pt-4 border-t border-slate-100 bg-white flex items-center justify-between" onclick="event.stopPropagation()">
-                    <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-sm">
-                        <button class="w-6 h-6 rounded text-slate-500 hover:bg-slate-200 transition font-bold text-sm" onclick="updateCardPortions(${r.id}, -1)">-</button>
-                        <span id="card-port-${r.id}" class="w-4 text-center font-bold text-slate-800 text-sm">${cardPortions[r.id] || 2}</span>
-                        <button class="w-6 h-6 rounded text-slate-500 hover:bg-slate-200 transition font-bold text-sm" onclick="updateCardPortions(${r.id}, 1)">+</button>
+                <div class="pt-3.5 border-t border-slate-100 bg-white flex items-center justify-between" onclick="event.stopPropagation()">
+                    <div class="flex items-center gap-2 bg-slate-100/80 border border-slate-200/80 rounded-xl px-2 py-1 shadow-2xs">
+                        <button class="w-7 h-7 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition font-bold text-sm flex items-center justify-center active:scale-95 shadow-2xs" onclick="updateCardPortions(${r.id}, -1)">-</button>
+                        <span id="card-port-${r.id}" class="w-5 text-center font-black text-slate-900 text-sm">${cardPortions[r.id] || 2}</span>
+                        <button class="w-7 h-7 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition font-bold text-sm flex items-center justify-center active:scale-95 shadow-2xs" onclick="updateCardPortions(${r.id}, 1)">+</button>
                     </div>
-                    <button id="add-btn-${r.id}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm w-[110px]" onclick="addMeal(${r.id})">
+                    <button id="add-btn-${r.id}" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-xs min-w-[110px] flex items-center justify-center gap-1" onclick="addMeal(${r.id})">
                         + Add Meal
                     </button>
                 </div>
@@ -387,7 +377,8 @@
     function updateCardPortions(id, delta) {
         if (!cardPortions[id]) cardPortions[id] = 2;
         cardPortions[id] = Math.max(1, cardPortions[id] + delta);
-        document.getElementById(`card-port-${id}`).innerText = cardPortions[id];
+        const el = document.getElementById(`card-port-${id}`);
+        if (el) el.innerText = cardPortions[id];
     }
 
     function addMeal(id) {
@@ -396,16 +387,23 @@
         mealPlan[id] += qty;
         
         const btn = document.getElementById(`add-btn-${id}`);
-        const ogText = '+ Add Meal';
-        btn.innerHTML = `<span aria-hidden="true" style="font-style:normal">✓</span> Added`;
-        btn.classList.replace('bg-indigo-600', 'bg-green-500');
-        btn.classList.replace('hover:bg-indigo-700', 'hover:bg-green-600');
-        setTimeout(() => {
-            if (!btn.isConnected) return;
-            btn.innerHTML = ogText;
-            btn.classList.replace('bg-green-500', 'bg-indigo-600');
-            btn.classList.replace('hover:bg-green-600', 'hover:bg-indigo-700');
-        }, 2000);
+        if (btn) {
+            const ogText = '+ Add Meal';
+            btn.innerHTML = `<span aria-hidden="true" style="font-style:normal">✓</span> Added`;
+            btn.classList.replace('bg-indigo-600', 'bg-emerald-500');
+            btn.classList.replace('hover:bg-indigo-700', 'hover:bg-emerald-600');
+            setTimeout(() => {
+                if (!btn.isConnected) return;
+                btn.innerHTML = ogText;
+                btn.classList.replace('bg-emerald-500', 'bg-indigo-600');
+                btn.classList.replace('hover:bg-emerald-600', 'hover:bg-indigo-700');
+            }, 2000);
+        }
+
+        if (topBadgeCount) {
+            topBadgeCount.classList.add('scale-125');
+            setTimeout(() => topBadgeCount.classList.remove('scale-125'), 200);
+        }
 
         updateTopBadge();
         renderDrawerList();
@@ -456,14 +454,14 @@
         document.getElementById('modalPortionCount').innerText = localModalPortions;
         
         document.getElementById('modalBadges').innerHTML = `
-            <span class="text-xs font-semibold bg-blue-50 text-blue-600 px-3 py-1.5 rounded-md">💪 ${r.pro}g Pro</span>
-            <span class="text-xs font-semibold bg-orange-50 text-orange-600 px-3 py-1.5 rounded-md">🔥 ${r.cal} kcal</span>
-            <span class="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-md">⏱️ ${r.time}m</span>
+            <span class="text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-100/80 px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-2xs">💪 ${r.pro}g Pro</span>
+            <span class="text-xs font-extrabold bg-amber-50 text-amber-700 border border-amber-100/80 px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-2xs">🔥 ${r.cal} kcal</span>
+            <span class="text-xs font-extrabold bg-slate-100 text-slate-700 border border-slate-200/60 px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-2xs">⏱️ ${r.time}m</span>
         `;
         
         const multiplier = localModalPortions;
         document.getElementById('modalIngredients').innerHTML = r.ing.map(ing => 
-            `<li class="flex items-center"><div class="w-1.5 h-1.5 rounded-full bg-indigo-400 mr-2 shrink-0"></div> <span>${scaleIngredientText(ing, multiplier)}</span></li>`
+            `<li class="flex items-center bg-slate-50 border border-slate-200/60 p-2.5 rounded-xl text-slate-800 text-sm font-medium"><div class="w-2 h-2 rounded-full bg-indigo-500 mr-2.5 shrink-0"></div> <span>${scaleIngredientText(ing, multiplier)}</span></li>`
         ).join('');
         
         document.getElementById('modalInstructions').innerText = r.inst;
@@ -476,13 +474,13 @@
             renderDrawerList();
             
             const ogText = '+ Add to Meal Plan';
-            addBtn.innerHTML = `<span class="mr-2" aria-hidden="true" style="font-style:normal">✓</span> Added to Plan`;
-            addBtn.classList.replace('bg-indigo-600', 'bg-green-500');
-            addBtn.classList.replace('hover:bg-indigo-700', 'hover:bg-green-600');
+            addBtn.innerHTML = `<span class="mr-1" aria-hidden="true" style="font-style:normal">✓</span> Added to Plan`;
+            addBtn.classList.replace('bg-indigo-600', 'bg-emerald-500');
+            addBtn.classList.replace('hover:bg-indigo-700', 'hover:bg-emerald-600');
             setTimeout(() => {
                 addBtn.innerHTML = ogText;
-                addBtn.classList.replace('bg-green-500', 'bg-indigo-600');
-                addBtn.classList.replace('hover:bg-green-600', 'hover:bg-indigo-700');
+                addBtn.classList.replace('bg-emerald-500', 'bg-indigo-600');
+                addBtn.classList.replace('hover:bg-emerald-600', 'hover:bg-indigo-700');
                 if (currentModalRecipeId === r.id) closeModal();
             }, 1000);
         };
@@ -513,14 +511,14 @@
     function updateTopBadge() {
         const mealIds = Object.keys(mealPlan);
         const totalPortions = mealIds.reduce((sum, id) => sum + mealPlan[id], 0);
-        topBadgeCount.innerText = totalPortions;
+        if (topBadgeCount) topBadgeCount.innerText = totalPortions;
         savePlan();
     }
 
     function renderDrawerList() {
         const ids = Object.keys(mealPlan);
         if (ids.length === 0) {
-            drawerEmpty.style.display = 'block';
+            drawerEmpty.style.display = 'flex';
             drawerList.innerHTML = '';
             return;
         }
@@ -530,18 +528,22 @@
             const r = recipesData.find(x => x.id == id);
             if(!r) return '';
             return `
-            <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between">
-                <div>
-                    <h4 class="font-bold text-slate-800 leading-tight">${r.title}</h4>
-                    <div class="flex items-center gap-2 mt-1">
-                        <button onclick="changePlanQty(${id}, -1)" class="w-6 h-6 rounded bg-slate-100 text-slate-600 font-bold">-</button>
-                        <span class="text-xs text-slate-500 font-medium">${mealPlan[id]} Portion${mealPlan[id] === 1 ? '' : 's'}</span>
-                        <button onclick="changePlanQty(${id}, 1)" class="w-6 h-6 rounded bg-slate-100 text-slate-600 font-bold">+</button>
-                    </div>
+            <div class="bg-white p-4 rounded-2xl shadow-2xs border border-slate-200/80 flex items-center justify-between gap-3 hover:border-slate-300 transition-colors">
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 block mb-0.5">${r.cat}</span>
+                    <h4 class="font-extrabold text-slate-900 leading-snug text-sm truncate">${r.title}</h4>
+                    <p class="text-xs text-slate-500 mt-0.5 font-medium">${r.pro}g pro • ${r.cal} kcal</p>
                 </div>
-                <button onclick="removeMeal(${id})" class="w-8 h-8 rounded-full text-red-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition">
-                    <span aria-hidden="true" style="font-style:normal">🗑️</span>
-                </button>
+                <div class="flex items-center gap-3 shrink-0">
+                    <div class="flex items-center gap-2 bg-slate-100/80 border border-slate-200/80 rounded-xl px-2 py-1 shadow-2xs">
+                        <button onclick="changePlanQty(${id}, -1)" class="w-6 h-6 rounded-lg bg-white text-slate-700 font-bold hover:bg-slate-50 transition shadow-2xs flex items-center justify-center text-xs active:scale-95">-</button>
+                        <span class="text-xs font-extrabold text-slate-900 min-w-[50px] text-center">${mealPlan[id]} ${mealPlan[id] === 1 ? 'Portion' : 'Portions'}</span>
+                        <button onclick="changePlanQty(${id}, 1)" class="w-6 h-6 rounded-lg bg-white text-slate-700 font-bold hover:bg-slate-50 transition shadow-2xs flex items-center justify-center text-xs active:scale-95">+</button>
+                    </div>
+                    <button onclick="removeMeal(${id})" class="w-8 h-8 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 border border-transparent hover:border-red-100 flex items-center justify-center transition active:scale-95" title="Remove meal">
+                        <span aria-hidden="true" style="font-style:normal">🗑️</span>
+                    </button>
+                </div>
             </div>`;
         }).join('');
     }
@@ -637,62 +639,75 @@
 
     let latestAIResponseText = '';
 
-    function parseAndFormatAIResponse(rawText) {
-        if (!rawText) return '';
+    function processAIOutput(markdownText) {
+        if (!markdownText) return '';
+        // Remove markdown checkboxes like '- [ ] ' or '- [x] ' so output is non-interactive report style
+        const cleanMarkdown = markdownText.replace(/-\s*\[[ xX]?\]\s*/g, '- ');
+        
+        let rawHtml = '';
+        if (typeof marked !== 'undefined' && marked.parse) {
+            rawHtml = marked.parse(cleanMarkdown);
+        } else {
+            rawHtml = cleanMarkdown;
+        }
 
-        let text = rawText.replace(/\r\n/g, '\n');
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = rawHtml;
 
-        // Pre-process markdown checkboxes (- [ ], - [x], * [ ]) into touch-friendly cards
-        text = text.replace(/^[ \t]*[-*]\s*\[([ xX]?)\]\s*(.+)$/gm, (match, checked, itemText) => {
-            const isChecked = checked.trim().toLowerCase() === 'x';
-            const checkedAttr = isChecked ? 'checked' : '';
-            const completedClass = isChecked ? ' completed' : '';
-            const lineClass = isChecked ? ' line-through text-slate-400 opacity-60' : '';
-            return `<div class="ai-card-item mb-2"><label class="ai-check-card ${completedClass}"><input type="checkbox" ${checkedAttr} onchange="this.parentElement.classList.toggle('completed', this.checked); const s=this.nextElementSibling; s.classList.toggle('line-through'); s.classList.toggle('text-slate-400'); s.classList.toggle('opacity-60');"><span class="font-medium text-slate-700 text-sm ${lineClass}">${itemText.trim()}</span></label></div>`;
+        // Strip any residual interactive checkbox inputs
+        tempDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.remove());
+
+        // 1. Section Banners (###)
+        tempDiv.querySelectorAll('h1, h2, h3').forEach(heading => {
+            heading.className = 'bg-indigo-50/80 border-l-4 border-indigo-600 text-slate-900 font-black text-base md:text-lg p-3.5 rounded-r-xl my-4 flex items-center gap-2 shadow-2xs tracking-tight';
         });
 
-        // Parse with marked.js engine
-        let html = (typeof marked !== 'undefined' && marked.parse) ? marked.parse(text) : text;
-
-        // Post-process <li> items into interactive check cards
-        html = html.replace(/<li>\s*(?!<label|<div class="ai-card-item)(.*?)\s*<\/li>/gi, (match, itemContent) => {
-            let cleanText = itemContent.replace(/<input[^>]*type=["']checkbox["'][^>]*>/gi, '').trim();
-            return `<div class="ai-card-item mb-2"><label class="ai-check-card"><input type="checkbox" onchange="this.parentElement.classList.toggle('completed', this.checked); const s=this.nextElementSibling; s.classList.toggle('line-through'); s.classList.toggle('text-slate-400'); s.classList.toggle('opacity-60');"><span class="font-medium text-slate-700 text-sm">${cleanText}</span></label></div>`;
+        // 2. Aisle / Category Headings
+        tempDiv.querySelectorAll('h4, h5').forEach(heading => {
+            heading.className = 'text-xs font-extrabold uppercase tracking-widest text-indigo-600 mt-5 mb-2 block';
         });
 
-        // Remove wrapping <ul> / <ol> / <p> around card items
-        html = html.replace(/<ul[^>]*>\s*(<div class="ai-card-item.*<\/div>)\s*<\/ul>/gis, '$1');
-        html = html.replace(/<p>\s*(<div class="ai-card-item.*<\/div>)\s*<\/p>/gis, '$1');
-
-        // 1. Section Headings (###)
-        html = html.replace(/<h3([^>]*)>(.*?)<\/h3>/gi, '<h3 class="rounded-xl bg-indigo-50/60 border-l-4 border-indigo-600 p-4 mt-6 mb-4 text-slate-900 font-black text-base shadow-sm flex items-center gap-2"$1>$2</h3>');
-        html = html.replace(/<h2([^>]*)>(.*?)<\/h2>/gi, '<h2 class="rounded-xl bg-indigo-50/60 border-l-4 border-indigo-600 p-4 mt-6 mb-4 text-slate-900 font-black text-lg shadow-sm flex items-center gap-2"$1>$2</h2>');
-
-        // 2. Aisle / Category Badges (**Produce**, **Meat & Poultry**)
-        html = html.replace(/<p>[ \t]*<strong>([^<:]+):?<\/strong>[ \t]*<\/p>/gi, (match, catName) => {
-            if (catName.length > 35) return match;
-            return `<span class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mt-5 mb-2 block">${catName.trim()}</span>`;
+        // Process paragraphs for callouts & aisle titles
+        tempDiv.querySelectorAll('p').forEach(p => {
+            const text = p.textContent.trim();
+            if (/estimated total|total cost|price range|est\.? total/i.test(text)) {
+                p.className = 'bg-emerald-50/90 border border-emerald-200/80 text-emerald-950 p-3.5 rounded-xl font-bold text-sm flex items-center justify-between my-3 shadow-2xs';
+                p.innerHTML = `<span class="flex items-center gap-2"><span class="text-base">💰</span> <span>${p.innerHTML}</span></span>`;
+                return;
+            }
+            if (/best supermarket|recommended store|top retailer|cheapest store/i.test(text)) {
+                p.className = 'bg-indigo-50/90 border border-indigo-200/80 text-indigo-950 p-3.5 rounded-xl font-bold text-sm flex items-center justify-between my-3 shadow-2xs';
+                p.innerHTML = `<span class="flex items-center gap-2"><span class="text-base">🏪</span> <span>${p.innerHTML}</span></span>`;
+                return;
+            }
+            if (p.children.length === 1 && p.children[0].tagName === 'STRONG' && !text.includes(':')) {
+                p.className = 'text-xs font-extrabold uppercase tracking-widest text-indigo-600 mt-5 mb-2 block';
+            }
         });
 
-        // 3. Price & Store Guide Metrics
-        html = html.replace(/<(p|li|div)[^>]*>[ \t]*<strong>(Estimated Total|Total Estimated Cost|Price|Total Price|Estimated Cost|Total Cost|Total|Estimated Savings|Savings):?<\/strong>\s*(.*?)[ \t]*<\/\1>/gi, (match, tag, label, val) => {
-            return `<div class="my-3 p-3.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-bold shadow-sm flex items-center justify-between gap-3">` +
-                        `<span class="text-xs font-extrabold uppercase tracking-wider text-emerald-800">${label.replace(/:$/, '')}</span>` +
-                        `<span class="text-sm bg-white/90 px-3 py-1 rounded-lg border border-emerald-200/60 text-emerald-700">${val.trim()}</span>` +
-                   `</div>`;
+        // 3. Itemized List Rows & inline callout checks
+        tempDiv.querySelectorAll('ul').forEach(ul => {
+            ul.className = 'space-y-2 my-3 pl-0 list-none';
+            ul.querySelectorAll('li').forEach(li => {
+                const liText = li.textContent.trim();
+                if (/estimated total|total cost|price range|est\.? total/i.test(liText)) {
+                    li.className = 'bg-emerald-50/90 border border-emerald-200/80 text-emerald-950 p-3.5 rounded-xl font-bold text-sm flex items-center justify-between my-2 shadow-2xs';
+                    li.innerHTML = `<span class="flex items-center gap-2"><span class="text-base">💰</span> <span>${li.innerHTML}</span></span>`;
+                } else if (/best supermarket|recommended store|top retailer|cheapest store/i.test(liText)) {
+                    li.className = 'bg-indigo-50/90 border border-indigo-200/80 text-indigo-950 p-3.5 rounded-xl font-bold text-sm flex items-center justify-between my-2 shadow-2xs';
+                    li.innerHTML = `<span class="flex items-center gap-2"><span class="text-base">🏪</span> <span>${li.innerHTML}</span></span>`;
+                } else {
+                    li.className = 'bg-slate-50/80 border border-slate-200/60 rounded-xl p-3 mb-2 font-medium text-slate-800 text-sm flex justify-between items-center shadow-2xs hover:bg-slate-100/80 transition-colors';
+                }
+            });
         });
 
-        html = html.replace(/<(p|li|div)[^>]*>[ \t]*<strong>(Best Supermarket|Store|Recommended Store|Best Store|Supermarket|Cheapest Supermarket|Store Recommendation|Cheapest Option):?<\/strong>\s*(.*?)[ \t]*<\/\1>/gi, (match, tag, label, val) => {
-            return `<div class="my-3 p-3.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200/60 font-bold shadow-sm flex items-center justify-between gap-3">` +
-                        `<span class="text-xs font-extrabold uppercase tracking-wider text-indigo-800">${label.replace(/:$/, '')}</span>` +
-                        `<span class="text-sm bg-white/90 px-3 py-1 rounded-lg border border-indigo-200/60 text-indigo-700">${val.trim()}</span>` +
-                   `</div>`;
+        // 4. Horizontal Dividers
+        tempDiv.querySelectorAll('hr').forEach(hr => {
+            hr.className = 'border-t border-dashed border-slate-200 my-6';
         });
 
-        // 4. Horizontal Dividers (---)
-        html = html.replace(/<hr\s*\/?>/gi, '<hr class="border-t border-dashed border-slate-200 my-6">');
-
-        return html;
+        return tempDiv.innerHTML;
     }
 
     async function generateAIPrompt() {
@@ -701,12 +716,11 @@
 
         const aggregatedList = getAggregatedIngredientStrings().join('\n');
 
+        // Open the AI response modal immediately with a loader
         const aiContent = document.getElementById('aiContent');
         const aiLoader = document.getElementById('aiLoader');
 
-        // Open modal and show loader
-        aiContent.classList.add('hidden', 'opacity-0');
-        aiContent.classList.remove('opacity-100');
+        aiContent.classList.add('hidden');
         aiLoader.classList.remove('hidden');
         document.getElementById('aiModal').classList.replace('modal-closed', 'modal-open');
 
@@ -726,22 +740,26 @@
 
             if (response.ok && data.result) {
                 latestAIResponseText = data.result;
-                aiContent.innerHTML = parseAndFormatAIResponse(latestAIResponseText);
+                
+                // Parse markdown and post-process HTML nodes
+                const formattedHtml = processAIOutput(latestAIResponseText);
+                aiContent.innerHTML = formattedHtml;
+
+                // Hide loader and show content with smooth opacity fade-in
                 aiLoader.classList.add('hidden');
                 aiContent.classList.remove('hidden');
-                // Smooth fade-in animation
-                setTimeout(() => {
+                aiContent.classList.add('opacity-0');
+                requestAnimationFrame(() => {
                     aiContent.classList.remove('opacity-0');
                     aiContent.classList.add('opacity-100');
-                }, 50);
+                });
             } else {
                 throw new Error(data.error || 'Failed to generate AI response');
             }
         } catch (err) {
             aiLoader.classList.add('hidden');
-            aiContent.innerHTML = `<div class="p-4 rounded-xl bg-red-50 text-red-700 border border-red-200 font-medium">Error contacting AI service: ${err.message}</div>`;
-            aiContent.classList.remove('hidden', 'opacity-0');
-            aiContent.classList.add('opacity-100');
+            aiContent.innerHTML = `<div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs font-bold">Error contacting AI service: ${err.message}</div>`;
+            aiContent.classList.remove('hidden');
             latestAIResponseText = '';
         }
     }
