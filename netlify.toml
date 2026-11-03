@@ -2,8 +2,14 @@
   publish = "."
   functions = "netlify/functions"
 
+# Explicitly route /api/generate-ai and /.netlify/functions/generate-ai to the serverless engine
+[[redirects]]
+  from = "/api/generate-ai"
+  to = "/.netlify/functions/generate-ai"
+  status = 200
+
 [[headers]]
-  for = "/.netlify/functions/*"
+  for = "/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Headers = "Content-Type, Authorization"
