@@ -1,3 +1,6 @@
 [build]
+  # The directory containing your static site files (root)
   publish = "."
+  
+  # The directory where Netlify will look for serverless functions
   functions = "netlify/functions"
