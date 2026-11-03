@@ -47,8 +47,8 @@ exports.handler = async function(event, context) {
 
     const metaPrompt = process.env.AI_META_PROMPT || "You are a helpful grocery list and recipe assistant.";
 
-    // 3. Call Google Gemini API (gemini-2.5-flash)
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    // 3. Call Google Gemini API using gemini-3.8-flash
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
 
     const geminiResponse = await fetch(geminiUrl, {
       method: "POST",
