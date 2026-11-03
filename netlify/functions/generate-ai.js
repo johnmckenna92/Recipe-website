@@ -1,56 +1,56 @@
 exports.handler = async function(event, context) {
-  // 1. Standardize headers to force JSON responses and allow frontend access
+  // CORS and JSON response headers required for cross-origin requests from GitHub Pages
   const headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*", // Adjust to your domain in production
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS"
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Content-Type": "application/json"
   };
 
-  // 2. Handle CORS preflight requests
+  // 1. Immediately handle browser CORS preflight (OPTIONS) requests
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
-      headers,
-      body: JSON.stringify({ message: "CORS preflight successful" })
+      headers: headers,
+      body: ""
     };
   }
 
-  // 3. Reject non-POST requests cleanly
+  // 2. Reject non-POST requests
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      headers,
+      headers: headers,
       body: JSON.stringify({ error: "Method Not Allowed. Expected POST." })
     };
   }
 
   try {
-    // 4. Safely parse the frontend payload
-    const body = JSON.parse(event.body);
-    const userPrompt = body.prompt; // Ensure your frontend sends { "prompt": "..." }
+    // 3. Parse payload
+    const body = JSON.parse(event.body || "{}");
+    const userPrompt = body.prompt;
 
     if (!userPrompt) {
       return {
         statusCode: 400,
-        headers,
+        headers: headers,
         body: JSON.stringify({ error: "Missing 'prompt' in request body." })
       };
     }
 
-    // 5. Retrieve environment variables
+    // 4. Retrieve Netlify environment variables
     const apiKey = process.env.AI_API_KEY;
-    const metaPrompt = process.env.AI_META_PROMPT || "You are a helpful assistant.";
+    const metaPrompt = process.env.AI_META_PROMPT || "You are a helpful grocery list assistant.";
 
     if (!apiKey) {
       return {
         statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: "Server misconfiguration: Missing API Key." })
+        headers: headers,
+        body: JSON.stringify({ error: "Server error: Missing AI_API_KEY environment variable on Netlify." })
       };
     }
 
-    // 6. Call the OpenAI API
+    // 5. Call OpenAI Chat Completions API
     const openAiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -58,7 +58,7 @@ exports.handler = async function(event, context) {
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini", // Update to your preferred model
+        model: "gpt-4o-mini",
         messages: [
           { role: "system", content: metaPrompt },
           { role: "user", content: userPrompt }
@@ -67,39 +67,29 @@ exports.handler = async function(event, context) {
       })
     });
 
-    // 7. Handle OpenAI API errors gracefully
+    const data = await openAiResponse.json();
+
     if (!openAiResponse.ok) {
-      const errorData = await openAiResponse.json().catch(() => ({}));
       return {
         statusCode: openAiResponse.status,
-        headers,
-        body: JSON.stringify({ 
-          error: "OpenAI API request failed.", 
-          details: errorData 
-        })
+        headers: headers,
+        body: JSON.stringify({ error: "OpenAI API error", details: data })
       };
     }
 
-    // 8. Parse and return the successful AI response
-    const data = await openAiResponse.json();
-    
+    // 6. Return successful completion text
     return {
       statusCode: 200,
-      headers,
-      body: JSON.stringify({ 
-        result: data.choices[0].message.content 
-      })
+      headers: headers,
+      body: JSON.stringify({ result: data.choices[0].message.content })
     };
 
-  } catch (error) {
-    // 9. Catch JSON.parse errors or network failures and return as JSON
+  } catch (err) {
+    // 7. Catch any unexpected errors and return formatted JSON
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({ 
-        error: "Internal Server Error", 
-        details: error.message 
-      })
+      headers: headers,
+      body: JSON.stringify({ error: "Internal Server Error", details: err.message })
     };
   }
 };
