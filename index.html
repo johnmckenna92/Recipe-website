@@ -592,7 +592,7 @@
         document.getElementById('aiModal').classList.replace('modal-closed', 'modal-open');
 
         try {
-            const response = await fetch('https://recipe-website-xi-navy.vercel.app/api/generate-ai', {
+            const response = await fetch('https://recipe-website-orcin.vercel.app/api/generate-ai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: aggregatedList })
