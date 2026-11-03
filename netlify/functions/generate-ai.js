@@ -1,79 +1,105 @@
 exports.handler = async function(event, context) {
-  // Ensure it's a POST request
+  // 1. Standardize headers to force JSON responses and allow frontend access
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*", // Adjust to your domain in production
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS"
+  };
+
+  // 2. Handle CORS preflight requests
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ message: "CORS preflight successful" })
+    };
+  }
+
+  // 3. Reject non-POST requests cleanly
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Method Not Allowed" })
-    };
-  }
-
-  const apiKey = process.env.AI_API_KEY;
-  const metaPrompt = process.env.AI_META_PROMPT;
-
-  if (!apiKey) {
-    return {
-      statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Server Configuration Error: AI_API_KEY is missing in Netlify environment variables." })
-    };
-  }
-
-  if (!metaPrompt) {
-    return {
-      statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Server Configuration Error: AI_META_PROMPT is missing in Netlify environment variables." })
+      headers,
+      body: JSON.stringify({ error: "Method Not Allowed. Expected POST." })
     };
   }
 
   try {
-    let body = {};
-    try {
-      body = JSON.parse(event.body || "{}");
-    } catch (e) {
-      // fallback if body is empty or malformed
+    // 4. Safely parse the frontend payload
+    const body = JSON.parse(event.body);
+    const userPrompt = body.prompt; // Ensure your frontend sends { "prompt": "..." }
+
+    if (!userPrompt) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: "Missing 'prompt' in request body." })
+      };
     }
 
-    const userPrompt = body.prompt || "Generate a grocery list analysis";
-    const combinedPrompt = `${metaPrompt}\n\nUser Request / Ingredients:\n${userPrompt}`;
+    // 5. Retrieve environment variables
+    const apiKey = process.env.AI_API_KEY;
+    const metaPrompt = process.env.AI_META_PROMPT || "You are a helpful assistant.";
 
-    const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+    if (!apiKey) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: "Server misconfiguration: Missing API Key." })
+      };
+    }
+
+    // 6. Call the OpenAI API
+    const openAiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: combinedPrompt }]
+        model: "gpt-4o-mini", // Update to your preferred model
+        messages: [
+          { role: "system", content: metaPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.7
       })
     });
 
-    const data = await aiResponse.json();
-
-    if (!aiResponse.ok) {
-      const errorMessage = data.error?.message || "Unknown error from AI provider";
+    // 7. Handle OpenAI API errors gracefully
+    if (!openAiResponse.ok) {
+      const errorData = await openAiResponse.json().catch(() => ({}));
       return {
-        statusCode: aiResponse.status,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error: `AI Provider Error: ${errorMessage}` })
+        statusCode: openAiResponse.status,
+        headers,
+        body: JSON.stringify({ 
+          error: "OpenAI API request failed.", 
+          details: errorData 
+        })
       };
     }
 
-    const outputText = data.choices?.[0]?.message?.content || "No response generated.";
-
+    // 8. Parse and return the successful AI response
+    const data = await openAiResponse.json();
+    
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ result: outputText })
+      headers,
+      body: JSON.stringify({ 
+        result: data.choices[0].message.content 
+      })
     };
 
   } catch (error) {
+    // 9. Catch JSON.parse errors or network failures and return as JSON
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: `Function execution error: ${error.message}` })
+      headers,
+      body: JSON.stringify({ 
+        error: "Internal Server Error", 
+        details: error.message 
+      })
     };
   }
 };
