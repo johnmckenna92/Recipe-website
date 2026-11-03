@@ -92,7 +92,7 @@
                     <span class="mr-2" aria-hidden="true" style="font-style:normal">📤</span> Share Plan & Grocery List
                 </button>
                 <button onclick="generateAIPrompt()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-base">
-                    <span class="mr-2" aria-hidden="true" style="font-style:normal">🤖</span> Copy Supermarket AI Optimizer Prompt
+                    <span class="mr-2" aria-hidden="true" style="font-style:normal">🤖</span> Generate Supermarket AI Optimizer Output
                 </button>
             </div>
         </div>
@@ -146,6 +146,39 @@
             <div class="p-4 border-t border-slate-100 bg-white shrink-0 safe-b">
                 <button id="modalAddBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-base">
                     + Add to Meal Plan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Response Modal -->
+    <div id="aiModal" class="vis fixed inset-0 z-50 flex items-center justify-center p-4 modal-closed transition-all duration-200">
+        <div class="absolute inset-0 bg-slate-900/40 rounded-xl" onclick="closeAIModal()"></div>
+        <div class="bg-white rounded-2xl w-full max-w-xl modal-h flex flex-col relative z-10 shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
+                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <span>🤖</span> Supermarket AI Optimization
+                </h3>
+                <div class="flex gap-2">
+                    <button onclick="shareAIResponse()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-indigo-600 hover:bg-slate-100 shadow-sm transition text-sm" title="Share AI Response">
+                        <span aria-hidden="true" style="font-style:normal">📤</span>
+                    </button>
+                    <button onclick="closeAIModal()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-100 shadow-sm transition text-sm">
+                        <span aria-hidden="true" style="font-style:normal">✕</span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-5">
+                <div id="aiLoader" class="text-center py-12">
+                    <div class="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+                    <p class="text-sm font-bold text-slate-600">Consulting AI Supermarket Optimizer...</p>
+                    <p class="text-xs text-slate-400 mt-1">Analyzing prices, aisle breakdowns, and pack sizes.</p>
+                </div>
+                <div id="aiContent" class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap hidden"></div>
+            </div>
+            <div class="p-4 border-t border-slate-100 bg-white shrink-0 safe-b flex gap-2">
+                <button onclick="shareAIResponse()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3.5 rounded-xl font-bold flex justify-center items-center transition shadow-sm text-base">
+                    <span class="mr-2" aria-hidden="true" style="font-style:normal">📤</span> Share AI Output
                 </button>
             </div>
         </div>
@@ -545,28 +578,53 @@
         if (!w) copyText(shareData.text, 'Couldn\'t open the app - copied instead');
     }
 
-    function generateAIPrompt() {
+    let latestAIResponseText = '';
+
+    async function generateAIPrompt() {
         const ids = Object.keys(mealPlan);
         if(ids.length === 0) return showToast('Plan is empty! Add meals first.');
-        
-        const prompt = `You are an expert UK supermarket grocery planner and budget optimization assistant. I am providing you with an aggregated list of ingredients for my weekly meal plan.
 
-Please perform the following tasks:
-0. ESTIMATED PRICE ANALYSIS: Conduct a quick mental check of current online UK supermarket prices for the items on the list (factoring in budget baseline stores like Aldi/Lidl alongside mid-tier stores like Tesco/Sainsbury's). Provide an estimated total basket price and a brief breakdown of key cost-driving items.
-1. SUPERMARKET RECOMMENDATION: Analyze the specialty items in my list (e.g., Lo Dough bases, specific seasonings, specialized cheeses like Eat Lean, exotic curry pastes, etc.). Recommend whether I should do a main shop at a budget supermarket (Aldi/Lidl/Asda) and a secondary trip to a specialty retailer (Tesco, Sainsbury's, or M&S) for specific items, or if one specific supermarket covers everything best. Include specific stock availability notes where items are known to be exclusive to certain chains.
-2. CONSOLIDATION & PACK SIZES: Consolidate overlapping ingredients and suggest the most economical UK retail pack sizes to minimize food and packaging waste.
-3. AISLE ORGANIZATION & CONDITIONAL SECTIONS: Group the final shopping list by supermarket aisle (Produce, Meat & Poultry, Dairy & Refrigerated, Bakery, Pantry & Spices, Frozen). **Omit any aisle section entirely if there are zero items assigned to it.** For specialty items, include a quick budget-friendly or readily available supermarket substitution option in brackets.
-4. SMART TIPS: Add helpful UK shopping tips regarding own-brand alternatives, loyalty app savings (e.g., Tesco Clubcard / Sainsbury's Nectar prices), or bulk buying.
+        const aggregatedList = getAggregatedIngredientStrings().join('\n');
 
-Here is my aggregated ingredient list:
-${getAggregatedIngredientStrings().join('\n')}
+        // Open the AI response modal immediately with a loader
+        document.getElementById('aiContent').classList.add('hidden');
+        document.getElementById('aiLoader').classList.remove('hidden');
+        document.getElementById('aiModal').classList.replace('modal-closed', 'modal-open');
 
-Please output the structured estimated pricing, supermarket guide, and final optimized shopping list.`;
+        try {
+            // Securely call your Netlify Serverless Function
+            const response = await fetch('/.netlify/functions/generate-ai', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: aggregatedList })
+            });
 
-        copyText(prompt, 'AI prompt copied!', () => {
-            shareData = { title: 'Supermarket AI Prompt', text: prompt };
-            openShareSheet();
-        });
+            const data = await response.json();
+
+            if (response.ok && data.result) {
+                latestAIResponseText = data.result;
+                document.getElementById('aiContent').textContent = latestAIResponseText;
+                document.getElementById('aiLoader').classList.add('hidden');
+                document.getElementById('aiContent').classList.remove('hidden');
+            } else {
+                throw new Error(data.error || 'Failed to generate AI response');
+            }
+        } catch (err) {
+            document.getElementById('aiLoader').classList.add('hidden');
+            const errContent = document.getElementById('aiContent');
+            errContent.textContent = 'Error contacting AI service: ' + err.message;
+            errContent.classList.remove('hidden');
+            latestAIResponseText = '';
+        }
+    }
+
+    function closeAIModal() {
+        document.getElementById('aiModal').classList.replace('modal-open', 'modal-closed');
+    }
+
+    async function shareAIResponse() {
+        if (!latestAIResponseText) return showToast('No AI response available to share.');
+        await executeNativeShare("Supermarket AI Optimizer Output", latestAIResponseText);
     }
 
     let toastTimer;
@@ -603,7 +661,7 @@ Please output the structured estimated pricing, supermarket guide, and final opt
 
     document.addEventListener('keydown', e => {
         if (e.key !== 'Escape') return;
-        closeShareSheet(); closeModal(); toggleDrawer(false);
+        closeShareSheet(); closeModal(); closeAIModal(); toggleDrawer(false);
     });
 
     (function () {
