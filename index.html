@@ -593,13 +593,19 @@
 
         try {
             // Securely call your Netlify Serverless Function
-            const response = await fetch('/api/generate-ai', {
+            const response = await fetch('https://exquisite-croissant-55a588.netlify.app/.netlify/functions/generate-ai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: aggregatedList })
             });
-
+            
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`Server returned status ${response.status}: ${errorBody}`);
+            }
+            
             const data = await response.json();
+            // Your generated text is inside: data.result
 
             if (response.ok && data.result) {
                 latestAIResponseText = data.result;
