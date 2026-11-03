@@ -6,16 +6,16 @@ exports.handler = async function(event, context) {
     "Content-Type": "application/json"
   };
 
-  // Preflight OPTIONS check
+  // 1. Handle preflight CORS OPTIONS check
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ message: "CORS OK" })
+      body: JSON.stringify({ message: "CORS preflight successful" })
     };
   }
 
-  // Reject non-POST
+  // 2. Enforce POST method
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -30,7 +30,7 @@ exports.handler = async function(event, context) {
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: "Server Error: AI_API_KEY missing in Netlify settings." })
+        body: JSON.stringify({ error: "Server Error: Missing AI_API_KEY environment variable in Netlify." })
       };
     }
 
@@ -45,38 +45,45 @@ exports.handler = async function(event, context) {
       };
     }
 
-    const metaPrompt = process.env.AI_META_PROMPT || "You are a helpful assistant.";
+    const metaPrompt = process.env.AI_META_PROMPT || "You are a helpful grocery list and recipe assistant.";
 
-    const openAiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+    // 3. Call Google Gemini API (gemini-2.5-flash)
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+    const geminiResponse = await fetch(geminiUrl, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: metaPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0.7
+        systemInstruction: {
+          parts: [{ text: metaPrompt }]
+        },
+        contents: [
+          {
+            parts: [{ text: userPrompt }]
+          }
+        ]
       })
     });
 
-    const data = await openAiResponse.json();
+    const data = await geminiResponse.json();
 
-    if (!openAiResponse.ok) {
+    if (!geminiResponse.ok) {
       return {
-        statusCode: openAiResponse.status,
+        statusCode: geminiResponse.status,
         headers,
-        body: JSON.stringify({ error: "OpenAI error", details: data })
+        body: JSON.stringify({ error: "Google Gemini API error", details: data })
       };
     }
+
+    // 4. Extract generated text from Gemini's response payload
+    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ result: data.choices[0].message.content })
+      body: JSON.stringify({ result: generatedText })
     };
 
   } catch (err) {
