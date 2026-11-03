@@ -1,6 +1,10 @@
 [build]
-  # The directory containing your static site files (root)
   publish = "."
-  
-  # The directory where Netlify will look for serverless functions
   functions = "netlify/functions"
+
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
